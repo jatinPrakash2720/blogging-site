@@ -31,6 +31,6 @@ const blogSchema = new Schema(
   { timestamps: true }
 );
 
-videoSchema.plugin(mongooseAggregatePaginate);
+blogSchema.plugin(mongooseAggregatePaginate);
 
 export const Blog = mongoose.model("Blog", blogSchema);
