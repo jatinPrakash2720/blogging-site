@@ -1,5 +1,9 @@
 function App() {
-  return <div className="text-3xl text-amber-400">Hello world</div>
+  return (
+    <>
+      <h1>A blog app</h1>
+    </>
+  );
 }
 
-export default App
+export default App;
