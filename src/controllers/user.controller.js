@@ -8,6 +8,7 @@ import {
 import { generateAccessAndRefreshToken } from "../utils/genAccessAndRefreshToken.utils.js";
 import { ApiError } from "../utils/ApiError.util.js";
 import jwt from "jsonwebtoken";
+import { IMAGE_FOLDERS } from "../constants.js";
 
 const option = {
   httpOnly: true,
@@ -44,8 +45,14 @@ const registerUser = asyncHandler(async (req, res) => {
     if (!avatarLocalPath) {
       throw new ApiError(400, "Avatar File is required");
     }
-    const avatar = await uploadOnCloudinary(avatarLocalPath);
-    const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+    const avatar = await uploadOnCloudinary(
+      avatarLocalPath,
+      IMAGE_FOLDERS.AVATAR
+    );
+    const coverImage = await uploadOnCloudinary(
+      coverImageLocalPath,
+      IMAGE_FOLDERS.COVER
+    );
 
     if (!avatar) {
       throw new ApiError(400, "Avatar file is required");
@@ -280,7 +287,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
   if (!avatarLocalPath) {
     throw new ApiError(400, "Avatar file is missing");
   }
-  const avatar = await uploadOnCloudinary(avatarLocalPath);
+  const avatar = await uploadOnCloudinary(avatarLocalPath,IMAGE_FOLDERS.AVATAR);
 
   if (!avatar.url) {
     throw new ApiError(408, "Error while uploading on Cloudinary");
@@ -302,7 +309,7 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
   if (!coverImageLocalPath) {
     throw new ApiError(400, "Cover Image file is missing");
   }
-  const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+  const coverImage = await uploadOnCloudinary(coverImageLocalPath,IMAGE_FOLDERS.COVER);
 
   if (!coverImage.url) {
     throw new ApiError(408, "Error while uploading on Cloudinary");
@@ -388,7 +395,7 @@ const getUserPageProfile = asyncHandler(async (req, res) => {
     },
   ]);
   if (!userPage) {
-    throw new ApiError(404, "channel does not existss");
+    throw new ApiError(404, "channel does not exists");
   }
 
   return res

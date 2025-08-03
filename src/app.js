@@ -21,6 +21,9 @@ import userRouter from "./routes/user.route.js";
 //routes declaration
 app.use("/api/v1/users", userRouter);
 
+import blogRouter from "./routes/blog.route.js";
+
+app.use("/api/v1/blogs", blogRouter);
 // Add a test route
 app.get("/test", (req, res) => {
   res.json({ message: "Server is working" });
