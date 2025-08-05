@@ -2,7 +2,7 @@ import axios from "axios";
 import { LocalStorage } from "../utils/LocalStorage.util.js";
 
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_SERVER_URI,
+  baseURL: import.meta.vite.VITE_SERVER_URI,
   withCredentials: true,
 });
 
