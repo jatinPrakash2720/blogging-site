@@ -14,7 +14,7 @@ const getBlogs = asyncHandler(async (req, res) => {
   const limit = parseInt(req.query.limit, 10) || 10;
   const sortBy = req.query.sortBy || "createdAt";
   const sortOrder = req.query.sortOrder === "asc" ? 1 : -1;
-
+  const searchQuery = req.query.q;
   const pipeline = [];
 
   pipeline.push({
@@ -22,6 +22,16 @@ const getBlogs = asyncHandler(async (req, res) => {
       isPublisged: true,
     },
   });
+  if (searchQuery) {
+    pipeline.push({
+      $match: {
+        title: {
+          $regex: searchQuery,
+          $options: "i",
+        },
+      },
+    });
+  }
   pipeline.push({
     $lookup: {
       from: "users",
@@ -64,13 +74,33 @@ const getBlogs = asyncHandler(async (req, res) => {
     page: page,
     limit: limit,
     customLabels: {
-      docs: blogs, // Rename 'docs' to 'blogs' in the response
+      docs: "blogs", // Rename 'docs' to 'blogs' in the response
     },
   });
 
   return res
     .status(200)
     .json(new ApiResponse(200, blogs, "Published blogs fetched successfully"));
+});
+const getBlog = asyncHandler(async (req, res) => {
+  try {
+    const { blogId } = req.params;
+
+    const blog = await Blog.findById(blogId);
+    if (!blog) {
+      throw new ApiError(404, "Blog post not found");
+    }
+
+    if (!blog.isPublished) {
+      throw new ApiError(402, "Blog not found");
+    }
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, blog, "Blog fetched Successfully"));
+  } catch (error) {
+    throw new ApiError(500, error.message || "Internal Server error");
+  }
 });
 const createBlog = asyncHandler(async (req, res) => {
   try {
@@ -251,9 +281,15 @@ const toggleBlogStatus = asyncHandler(async (req, res) => {
     throw new ApiError(500, error.message || "Internal Server Error");
   }
 });
+const deleteBlog = asyncHandler(async (req, res) => {
+  const { blogId } = req.params;
+
+  
+})
 
 export {
   getBlogs,
+  getBlog,
   createBlog,
   updateBlogTitle,
   updateBlogContent,
