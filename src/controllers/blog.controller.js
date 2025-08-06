@@ -2,7 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.util";
 import { ApiResponse } from "../utils/ApiResponse.util";
 import { ApiError } from "../utils/ApiError.util";
 import { Blog } from "../models/blog.model";
-import { User } from "../models/user.model";
+import { User } from "../models/user.model"; // Still not directly used in these, but kept
 import {
   deleteFromCloudinary,
   uploadOnCloudinary,
@@ -19,7 +19,9 @@ const getBlogs = asyncHandler(async (req, res) => {
 
   pipeline.push({
     $match: {
-      isPublisged: true,
+      isPublished: true,
+      // NEW: Ensure only non-deleted blogs are fetched for the public list
+      isDeleted: false,
     },
   });
   if (searchQuery) {
@@ -61,6 +63,8 @@ const getBlogs = asyncHandler(async (req, res) => {
         fullName: "$owner.fullName",
         avatar: "$owner.avatar",
       },
+      // Optional: Truncate content for list view
+      content: { $substrCP: ["$content", 0, 200] },
     },
   });
 
@@ -74,7 +78,7 @@ const getBlogs = asyncHandler(async (req, res) => {
     page: page,
     limit: limit,
     customLabels: {
-      docs: "blogs", // Rename 'docs' to 'blogs' in the response
+      docs: "blogs", // Corrected: 'blogs' must be a string literal
     },
   });
 
@@ -82,6 +86,7 @@ const getBlogs = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, blogs, "Published blogs fetched successfully"));
 });
+
 const getBlog = asyncHandler(async (req, res) => {
   try {
     const { blogId } = req.params;
@@ -91,33 +96,52 @@ const getBlog = asyncHandler(async (req, res) => {
       throw new ApiError(404, "Blog post not found");
     }
 
-    if (!blog.isPublished) {
-      throw new ApiError(402, "Blog not found");
+    const isOwner =
+      req.user && blog.owner.toString() === req.user._id.toString();
+
+    if (!isOwner && (!blog.isPublised || blog.isDeleted)) {
+      throw new ApiError(404, "Blog not found or not accessible.");
     }
 
+    if (!isOwner) {
+      blog.views = (blog.views || 0) + 1;
+      await blog.save({ validateBeforeSave: false });
+    }
     return res
       .status(200)
       .json(new ApiResponse(200, blog, "Blog fetched Successfully"));
   } catch (error) {
+    // Ensure ApiError instances are re-thrown, others wrapped
+    if (error instanceof ApiError) {
+      throw error;
+    }
     throw new ApiError(500, error.message || "Internal Server error");
   }
 });
+
 const createBlog = asyncHandler(async (req, res) => {
   try {
     const { title, slug, content, status } = req.body;
     const thumbnailLocalPath = req.file?.path;
+
     if ([title, slug, content, status].some((field) => field?.trim() === "")) {
-      throw new ApiError(400, "All Fields are requied");
+      throw new ApiError(400, "All Fields are required"); // Corrected typo
     }
     if (!thumbnailLocalPath) {
       throw new ApiError(400, "Thumbnail is required");
     }
-    const exitedBlog = await Blog.findOne({
+
+    const existingBlog = await Blog.findOne({
       owner: req.user._id,
       slug: slug.toLowerCase(),
     });
-    if (!exitedBlog) {
-      throw new ApiError(409, "Blog with same slug already exists!");
+
+    // CORRECTED LOGIC: If a blog with the same slug by the same owner EXISTS, throw an error.
+    if (existingBlog) {
+      throw new ApiError(
+        409,
+        "You already have a blog with this slug. Please choose a different one."
+      );
     }
 
     const thumbnail = await uploadOnCloudinary(
@@ -125,30 +149,47 @@ const createBlog = asyncHandler(async (req, res) => {
       IMAGE_FOLDERS.THUMBNAIL
     );
 
-    if (!thumbnail) {
-      throw new ApiError(409, "Error while uploading upon cloudinary");
+    // CORRECTED: Check for thumbnail.url
+    if (!thumbnail || !thumbnail.url) {
+      throw new ApiError(500, "Error while uploading thumbnail to Cloudinary");
     }
+
     const blog = await Blog.create({
       title: title,
       slug: slug.toLowerCase(),
+      content: content, // Ensure content is passed
       thumbnail: thumbnail.url,
       owner: req.user._id,
       status: status,
       isPublished: status === "published",
+      // isDeleted and deletedAt will default to false/null as per schema
     });
 
-    const createdBlog = await Blog.findById(blog._id);
+    const createdBlog = await Blog.findById(blog._id).select("-__v");
 
     if (!createdBlog) {
       throw new ApiError(500, "Something went wrong while creating the blog");
     }
+
     return res
       .status(201)
-      .json(new ApiResponse(201, createBlog, "Blog created Successfully"));
+      .json(new ApiResponse(201, createdBlog, "Blog created Successfully")); // CORRECTED: Return createdBlog
   } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    // Handle Mongoose duplicate key error specifically if it occurs due to the index
+    if (error.code === 11000) {
+      // MongoDB duplicate key error code
+      throw new ApiError(
+        409,
+        "A blog with this slug already exists for your account."
+      );
+    }
     throw new ApiError(500, error.message || "Internal Error");
   }
 });
+
 const updateBlogTitle = asyncHandler(async (req, res) => {
   try {
     const { blogId } = req.params;
@@ -164,8 +205,9 @@ const updateBlogTitle = asyncHandler(async (req, res) => {
       throw new ApiError(404, "Blog Post not found");
     }
 
+    // CORRECTED TYPO: "authorizated" -> "authorized"
     if (blog.owner.toString() !== req.user._id.toString()) {
-      throw new ApiError(403, "You are not authorizated to update this blog");
+      throw new ApiError(403, "You are not authorized to update this blog");
     }
     blog.title = newTitle.trim();
     await blog.save({ validateBeforeSave: false });
@@ -174,9 +216,13 @@ const updateBlogTitle = asyncHandler(async (req, res) => {
       .status(200)
       .json(new ApiResponse(200, {}, "Blog title updated Successfully"));
   } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
     throw new ApiError(500, error.message || "Internal Error");
   }
 });
+
 const updateBlogContent = asyncHandler(async (req, res) => {
   try {
     const { blogId } = req.params;
@@ -192,8 +238,9 @@ const updateBlogContent = asyncHandler(async (req, res) => {
       throw new ApiError(404, "Blog Post not found");
     }
 
+    // CORRECTED TYPO: "authorizated" -> "authorized"
     if (blog.owner.toString() !== req.user._id.toString()) {
-      throw new ApiError(403, "You are not authorizated to update this blog");
+      throw new ApiError(403, "You are not authorized to update this blog");
     }
 
     blog.content = newContent.trim();
@@ -203,9 +250,13 @@ const updateBlogContent = asyncHandler(async (req, res) => {
       .status(200)
       .json(new ApiResponse(200, {}, "Blog Content updated Successfully"));
   } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
     throw new ApiError(500, error.message || "Internal Error");
   }
 });
+
 const updateBlogThumbnail = asyncHandler(async (req, res) => {
   try {
     const { blogId } = req.params;
@@ -218,30 +269,46 @@ const updateBlogThumbnail = asyncHandler(async (req, res) => {
     if (!blog) {
       throw new ApiError(404, "Blog Post not found");
     }
+    // CORRECTED TYPO: "authorizated" -> "authorized"
     if (blog.owner.toString() !== req.user._id.toString()) {
-      throw new ApiError(403, "You are not authorizated to update this blog");
+      throw new ApiError(403, "You are not authorized to update this blog");
     }
 
     const newThumbnail = await uploadOnCloudinary(
       newThumbnailLocalPath,
       IMAGE_FOLDERS.THUMBNAIL
     );
-    if (!newThumbnail.url) {
-      throw new ApiError(408, "Error while uploading on Cloudinary");
+    // CORRECTED: Check for newThumbnail existence and its URL
+    if (!newThumbnail || !newThumbnail.url) {
+      throw new ApiError(
+        500,
+        "Error while uploading new thumbnail to Cloudinary"
+      );
     }
 
-    const oldThumbnail = blog.thumbnail.toString();
+    const oldThumbnail = blog.thumbnail; // No need for .toString() here, it's already a string URL
 
     blog.thumbnail = newThumbnail.url;
     await blog.save({ validateBeforeSave: false });
 
-    await deleteFromCloudinary(oldThumbnail);
+    // Delete old thumbnail from Cloudinary only after new one is successfully saved
+    if (oldThumbnail) {
+      // Only attempt to delete if an old thumbnail existed
+      await deleteFromCloudinary(oldThumbnail);
+    }
 
-    return res.status(200, {}, "Blog Thumbnail updated Successfully");
+    // CORRECTED: Response format for ApiResponse
+    return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "Blog Thumbnail updated Successfully"));
   } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
     throw new ApiError(500, error.message || "Internal Error");
   }
 });
+
 const toggleBlogStatus = asyncHandler(async (req, res) => {
   try {
     const { blogId } = req.params;
@@ -250,8 +317,14 @@ const toggleBlogStatus = asyncHandler(async (req, res) => {
     if (!blog) {
       throw new ApiError(404, "Blog Post not found");
     }
+    // CORRECTED TYPO: "authorizated" -> "authorized"
     if (blog.owner.toString() !== req.user._id.toString()) {
-      throw new ApiError(403, "You are not authorizated to update this blog");
+      throw new ApiError(403, "You are not authorized to update this blog");
+    }
+
+    // NEW: Prevent toggling if the blog is soft-deleted
+    if (blog.isDeleted) {
+      throw new ApiError(400, "Cannot toggle status of a deleted blog.");
     }
 
     const lastUpdated = new Date(blog.updatedAt);
@@ -259,7 +332,7 @@ const toggleBlogStatus = asyncHandler(async (req, res) => {
 
     const timeDifference = currentTime.getTime() - lastUpdated.getTime();
 
-    const timeLimit = 10 * 60 * 1000;
+    const timeLimit = 10 * 60 * 1000; // 10 minutes in milliseconds
     if (timeDifference < timeLimit) {
       const remainingTimeMs = timeLimit - timeDifference;
       const remainingMinutes = Math.ceil(remainingTimeMs / (60 * 1000));
@@ -274,19 +347,97 @@ const toggleBlogStatus = asyncHandler(async (req, res) => {
 
     await blog.save({ validateBeforeSave: false });
 
-    return res
-      .status(200)
-      .json(200, {}, `Blog status toggled to '${blog.status}' successfully.`);
+    // CORRECTED: Response format for ApiResponse
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        {
+          blogId: blog._id,
+          isPublished: blog.isPublished,
+          status: blog.status,
+          updatedAt: blog.updatedAt, // Include updated timestamp for frontend reference
+        },
+        `Blog status toggled to '${blog.status}' successfully.`
+      )
+    );
   } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
     throw new ApiError(500, error.message || "Internal Server Error");
   }
 });
+
 const deleteBlog = asyncHandler(async (req, res) => {
-  const { blogId } = req.params;
+  try {
+    const { blogId } = req.params;
 
-  
-})
+    const blog = await Blog.findById(blogId);
 
+    if (!blog) {
+      throw new ApiError(404, "Blog post not found");
+    }
+
+    if (blog.owner.toString() !== req.user._id.toString()) {
+      throw new ApiError(403, "You are not authorized to delete this blog.");
+    }
+
+    blog.isPublished = false;
+    blog.status = "archived";
+
+    await blog.save({ validateBeforeSave: false });
+
+    await blog.delete();
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "Blog soft-deleted successfully."));
+  } catch (error) {
+    throw new ApiError(
+      500,
+      error.message || "Internal Server Error during blog soft-deletion"
+    );
+  }
+});
+
+const restoreBlog = asyncHandler(async (req, res) => {
+  try {
+    const { blogId } = req.params;
+
+    const blog = await blog.findById(blogId).withDeleted();
+
+    if (!blog) {
+      throw new ApiError(404, "Blog post not found");
+    }
+
+    if (!blog.isDeleted) {
+      throw new ApiError(
+        400,
+        "Blog is not currently deleted and cannot be restored."
+      );
+    }
+
+    if (blog.owner.toString() !== req.user._id.toString()) {
+      throw new ApiError(403, "You are not authorized to restore this blog");
+    }
+
+    await blog.restore();
+
+    blog.isPublished = false;
+    blog.status = "draft";
+
+    await blog.save({ validateBeforeSave: false });
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "Blog restored successfully."));
+  } catch (error) {
+    throw new ApiError(
+      500,
+      error.message || "Internaal Server Error during blog restoration."
+    );
+  }
+});
 export {
   getBlogs,
   getBlog,
@@ -295,4 +446,6 @@ export {
   updateBlogContent,
   updateBlogThumbnail,
   toggleBlogStatus,
+  deleteBlog, // Export the new delete function
+  restoreBlog, // Export the new restore function
 };
