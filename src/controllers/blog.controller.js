@@ -119,6 +119,73 @@ const getBlog = asyncHandler(async (req, res) => {
   }
 });
 
+const getBlogsByUserId = asyncHandler(async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 1;
+    const sortBy = req.query.sortBy || "createdAt";
+    const sortOrder = req.query.sortOrder === "asc" ? 1 : -1;
+  
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      throw new ApiError(400, "Invalid user ID format.");
+    }
+  
+    const pipeline = [];
+  
+    pipeline.push({
+      $match: {
+        owner: new mongoose.Types.ObjectId(userId),
+        isDeleted: false,
+        isPublished: true,
+      },
+    });
+    pipeline.push({
+      $unwind: {
+        path: "$owner",
+        preserveNullAndEmptyArrays: true,
+      },
+    });
+    pipeline.push({
+      $project: {
+        title: 1,
+        thumbnail: 1,
+        slug: 1,
+        views: 1,
+        isPublished: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        owner: {
+          _id: "$owner._id",
+          username: "$owner.username",
+          fullName: "$owner.fullName",
+          avatar: "$owner.avatar",
+        },
+        content: { $substrCP: ["$content", 0, 200] },
+      },
+    });
+    const sortStage = {};
+    sortStage[sortBy] = sortOrder;
+    pipeline.push({
+      $sort: sortStage,
+    });
+  
+    const userBlogs = await Blog.aggregatePaginate(Blog.aggregate(pipeline), {
+      page: page,
+      limit: limit,
+      customLabels: {
+        docs: "blogs",
+      },
+    });
+  
+    return res.status(200).json(
+      new ApiResponse(200, userBlogs, "User blogs fetched successfully.")
+    )
+  } catch (error) {
+    throw new ApiError(500, error.message || "Internal Server error while fetching blogs by userid.")
+  }
+});
+
 const createBlog = asyncHandler(async (req, res) => {
   try {
     const { title, slug, content, status } = req.body;
@@ -443,6 +510,7 @@ const restoreBlog = asyncHandler(async (req, res) => {
 export {
   getBlogs,
   getBlog,
+  getBlogsByUserId,
   createBlog,
   updateBlogTitle,
   updateBlogContent,

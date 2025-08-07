@@ -15,6 +15,7 @@ import {
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { getBlogsByUserId } from "../controllers/blog.controller.js";
 const router = Router();
 // console.log("User routes loaded");
 
@@ -46,5 +47,6 @@ router
   .patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage);
 router.route("/c/:username").get(verifyJWT, getUserPageProfile);
 router.route("/history").get(verifyJWT, getReadHistory);
+router.route("/:userId/blogs").get(verifyJWT, getBlogsByUserId);
 // router.route("/login").post(registerUser);
 export default router;
