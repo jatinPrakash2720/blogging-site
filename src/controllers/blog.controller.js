@@ -99,7 +99,7 @@ const getBlog = asyncHandler(async (req, res) => {
     const isOwner =
       req.user && blog.owner.toString() === req.user._id.toString();
 
-    if (!isOwner && (!blog.isPublised || blog.isDeleted)) {
+    if (!isOwner && (!blog.isPublished || blog.isDeleted)) {
       throw new ApiError(404, "Blog not found or not accessible.");
     }
 
@@ -289,7 +289,7 @@ const updateBlogThumbnail = asyncHandler(async (req, res) => {
     const oldThumbnail = blog.thumbnail; // No need for .toString() here, it's already a string URL
 
     blog.thumbnail = newThumbnail.url;
-    await blog.save({ validateBeforeSave: false });
+    const updatedBlog = await blog.save({ validateBeforeSave: false });
 
     // Delete old thumbnail from Cloudinary only after new one is successfully saved
     if (oldThumbnail) {
@@ -300,7 +300,9 @@ const updateBlogThumbnail = asyncHandler(async (req, res) => {
     // CORRECTED: Response format for ApiResponse
     return res
       .status(200)
-      .json(new ApiResponse(200, {}, "Blog Thumbnail updated Successfully"));
+      .json(
+        new ApiResponse(200, updatedBlog, "Blog Thumbnail updated Successfully")
+      );
   } catch (error) {
     if (error instanceof ApiError) {
       throw error;
@@ -404,7 +406,7 @@ const restoreBlog = asyncHandler(async (req, res) => {
   try {
     const { blogId } = req.params;
 
-    const blog = await blog.findById(blogId).withDeleted();
+    const blog = await Blog.findById(blogId).withDeleted();
 
     if (!blog) {
       throw new ApiError(404, "Blog post not found");
