@@ -1,18 +1,19 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  changeCurrentPassword,
-  getCurrentUser,
+  registerUser,
   loginUser,
   logoutUser,
   refreshAccessToken,
-  registerUser,
+  changeCurrentPassword,
+  getCurrentUser,
+  updateUserFullName,
+  updateUserEmail,
   updateUserAvatar,
   updateUserCoverImage,
-  updateUserFullName,
 } from "../apis/user.api.js";
 import Loader from "../components/Loader.jsx";
-import { LocalStorage, requestHander } from "../utils/index.js";
+import { LocalStorage, requestHandler } from "../utils/index.js";
 
 const AuthContext = createContext({
   currentUser: null,
@@ -49,7 +50,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     setError(null);
-    await requestHander(
+    await requestHandler(
       () => loginUser(credentials),
       setLoading,
       (data) => {
@@ -67,7 +68,7 @@ export const AuthProvider = ({ children }) => {
   };
   const register = async (userData) => {
     setError(null);
-    await requestHander(
+    await requestHandler(
       () => registerUser(userData),
       setLoading,
       (data) => {
@@ -85,7 +86,7 @@ export const AuthProvider = ({ children }) => {
   };
   const logout = async () => {
     setError(null);
-    await requestHander(
+    await requestHandler(
       () => logoutUser(),
       setLoading,
       () => {
@@ -101,7 +102,7 @@ export const AuthProvider = ({ children }) => {
   };
   const refreshAuthToken = async () => {
     setError(null);
-    await requestHander(
+    await requestHandler(
       () => refreshAccessToken(),
       setLoading,
       (data) => {
@@ -117,7 +118,7 @@ export const AuthProvider = ({ children }) => {
   };
   const fetchCurrentUser = async () => {
     setError(null);
-    await requestHander(
+    await requestHandler(
       () => getCurrentUser(),
       setLoading,
       (data) => {
@@ -165,7 +166,7 @@ export const AuthProvider = ({ children }) => {
       return;
     }
 
-    await requestHander(
+    await requestHandler(
       apiCall,
       setLoading,
       async (data) => {

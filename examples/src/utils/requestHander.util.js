@@ -1,6 +1,6 @@
 import { isBrowser } from "./LocalStorage.util";
 
-const requestHander = async (api, setLoading, onSuccess, onError) => {
+const requestHandler = async (api, setLoading, onSuccess, onError) => {
   setLoading && setLoading(true);
   try {
     const response = await api();
@@ -19,4 +19,4 @@ const requestHander = async (api, setLoading, onSuccess, onError) => {
   }
 };
 
-export {requestHander}
+export {requestHandler}
