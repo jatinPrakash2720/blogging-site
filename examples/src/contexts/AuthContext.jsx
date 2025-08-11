@@ -51,6 +51,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     setError(null);
     await requestHandler(
+    // loginUser(credentials),
       () => loginUser(credentials),
       setLoading,
       (data) => {
