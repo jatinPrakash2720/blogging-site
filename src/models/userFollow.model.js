@@ -1,12 +1,13 @@
 import mongoose, { Schema } from "mongoose";
+import MongooseDelete from "mongoose-delete";
 
 const userFollowSchema = new Schema(
   {
-    followerid: {
+    followerId: {
       type: Schema.Types.ObjectId,
       ref: "User",
     },
-    followingid: {
+    followingId: {
       type: Schema.Types.ObjectId,
       ref: "User",
     },
@@ -14,4 +15,9 @@ const userFollowSchema = new Schema(
   { timestamps: true }
 );
 
+userFollowSchema.index({ followerId: 1, followingId: 1 }, { unique: true });
+userFollowSchema.plugin(MongooseDelete, {
+  overrideMethods: "all",
+  deletedAt: true,
+});
 export const UserFollow = mongoose.model("UserFollow", userFollowSchema);

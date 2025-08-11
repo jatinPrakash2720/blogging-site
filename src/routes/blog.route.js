@@ -5,6 +5,8 @@ import {
   deleteBlog,
   getBlog,
   getBlogs,
+  getBlogsBySubCategory,
+  getBlogsByTopLevelCategory,
   restoreBlog,
   toggleBlogStatus,
   updateBlogContent,
@@ -13,17 +15,20 @@ import {
 } from "../controllers/blog.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 const router = Router();
+router.use(verifyJWT);
 
-router.route("/").get(verifyJWT, getBlogs);
-router.route("/").post(verifyJWT, upload.single("thumbnail"), createBlog);
-router.route("/:blogId").get(verifyJWT, getBlog);
-router.route("/:blogId/title").patch(verifyJWT, updateBlogTitle);
-router.route("/:blogId/content").patch(verifyJWT, updateBlogContent);
+router.route("/").get(getBlogs);
+router.route("/").post(upload.single("thumbnail"), createBlog);
+router.route("/:blogId").get(getBlog);
+router.route("/:blogId/title").patch(updateBlogTitle);
+router.route("/:blogId/content").patch(updateBlogContent);
 router
   .route("/:blogId/thumbnail")
-  .patch(verifyJWT, upload.single("thumbnail"), updateBlogThumbnail);
-router.route("/:blogId/toggle-status").patch(verifyJWT, toggleBlogStatus);
-router.route("/:blogId").delete(verifyJWT, deleteBlog);
-router.route("/:blogId/restore").patch(verifyJWT, restoreBlog);
+  .patch(upload.single("thumbnail"), updateBlogThumbnail);
+router.route("/:blogId/toggle-status").patch(toggleBlogStatus);
+router.route("/:blogId").delete(deleteBlog);
+router.route("/:blogId/restore").patch(restoreBlog);
+router.route("/by-category/:categotyId").get(getBlogsByTopLevelCategory);
+router.route("/by-sub-category/:subCategoryId").get(getBlogsBySubCategory);
 
 export default router;

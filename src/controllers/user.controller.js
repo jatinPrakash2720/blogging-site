@@ -5,7 +5,7 @@ import {
   deleteFromCloudinary,
   uploadOnCloudinary,
 } from "../utils/Cloudinary.util.js";
-import { generateAccessAndRefreshToken } from "../utils/genAccessAndRefreshToken.utils.js";
+import { generateAccessAndRefreshToken } from "../utils/genAccessAndRefreshToken.util.js";
 import { ApiError } from "../utils/ApiError.util.js";
 import jwt from "jsonwebtoken";
 import { IMAGE_FOLDERS } from "../constants.js";

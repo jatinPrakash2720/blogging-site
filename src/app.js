@@ -1,8 +1,10 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import helmet from "helmet";
 
 const app = express();
+app.use(helmet());
 
 app.use(
   cors({
@@ -17,16 +19,45 @@ app.use(cookieParser());
 
 //routes import
 import userRouter from "./routes/user.route.js";
-
-//routes declaration
 app.use("/api/v1/users", userRouter);
 
 import blogRouter from "./routes/blog.route.js";
-
 app.use("/api/v1/blogs", blogRouter);
-// Add a test route
-app.get("/test", (req, res) => {
-  res.json({ message: "Server is working" });
-});
 
+import categoryRouter from "./routes/categories.route.js";
+app.use("/api/v1/categories", categoryRouter);
+
+import followRouter from "./routes/userfollow.route.js";
+app.use("/api/v1/follow", followRouter);
+
+import saveRouter from "./routes/save.route.js";
+app.use("/api/v1/saves", saveRouter);
+
+import likeRouter from "./routes/like.route.js";
+app.use("/api/v1/likes", likeRouter);
+
+import commentRouter from "./routes/comment.route.js";
+app.use("/api/v1/comments", commentRouter);
+
+import { apiLimiter } from "./middlewares/ratelimiter.middleware.js";
+app.use("/api", apiLimiter);
+
+//centrailized error control
+import { ApiError } from "./utils/ApiError.util.js";
+app.use((err, req, res, next) => {
+  if (err instanceof ApiError) {
+    return res.status(err.statusCode).json({
+      success: false,
+      message: err.message,
+      error: err.errors,
+    });
+  }
+  console.error(err);
+
+  return res.status(500).json({
+    success: false,
+    message: "Internal Server Error",
+    errors: [],
+  });
+});
 export { app };

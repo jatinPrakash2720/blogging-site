@@ -1,20 +1,34 @@
 import dotenv from "dotenv";
-import connectDB from "./db/index.js";
 dotenv.config({
-  path: "./env",
+  path: "./.env",
 });
+import connectDB from "./db/index.js";
 import { app } from "./app.js";
 
-connectDB()
-  .then(() => {
+
+
+const startServer = async () => {
+  try {
+    // 1. Connect to the database
+    await connectDB();
+
+    // 2. Set up an error listener on the app
     app.on("error", (error) => {
-      console.log("ERROR in App.on :", error);
+      console.error("ERROR: ", error);
+      throw error; // Or handle it as needed
     });
+
+    // 3. Define the port
     const port = process.env.PORT || 8000;
-    app.listen(process.env.PORT || 8000, () => {
-      console.log(`Server is running at port ${port}`);
+
+    // 4. Start the server
+    app.listen(port, () => {
+      console.log(`✅ Server is running on port: ${port}`);
     });
-  })
-  .catch((err) => {
-    console.log("MONGO db connection failed", err);
-  });
+  } catch (err) {
+    console.error("❌ MONGO DB connection failed !!! ", err);
+    process.exit(1); // Exit the process with failure
+  }
+};
+
+startServer();

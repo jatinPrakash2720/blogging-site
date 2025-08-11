@@ -17,11 +17,15 @@ const uploadOnCloudinary = async (localFilePath, folder) => {
       public_id: publicId,
       resource_type: "auto",
     });
+    fs.unlinkSync(localFilePath);
     // console.log("File uploaded over Cloudinary: ", response.url);
     console.log(response);
     return response;
   } catch (error) {
-    fs.unlinkSync(localFilePath);
+    if (fs.existsSync(localFilePath)) {
+      // Check if file still exists before trying to delete
+      fs.unlinkSync(localFilePath);
+    }
     console.log("Catch u-block of Cloudinary: ", error);
     return null;
   }

@@ -8,6 +8,7 @@ import {
   uploadOnCloudinary,
 } from "../utils/Cloudinary.util";
 import { IMAGE_FOLDERS } from "../constants";
+import { Category } from "../models/category.model";
 
 const getBlogs = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page, 10) || 1;
@@ -126,13 +127,13 @@ const getBlogsByUserId = asyncHandler(async (req, res) => {
     const limit = parseInt(req.query.limit, 10) || 1;
     const sortBy = req.query.sortBy || "createdAt";
     const sortOrder = req.query.sortOrder === "asc" ? 1 : -1;
-  
+
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       throw new ApiError(400, "Invalid user ID format.");
     }
-  
+
     const pipeline = [];
-  
+
     pipeline.push({
       $match: {
         owner: new mongoose.Types.ObjectId(userId),
@@ -169,7 +170,7 @@ const getBlogsByUserId = asyncHandler(async (req, res) => {
     pipeline.push({
       $sort: sortStage,
     });
-  
+
     const userBlogs = await Blog.aggregatePaginate(Blog.aggregate(pipeline), {
       page: page,
       limit: limit,
@@ -177,12 +178,17 @@ const getBlogsByUserId = asyncHandler(async (req, res) => {
         docs: "blogs",
       },
     });
-  
-    return res.status(200).json(
-      new ApiResponse(200, userBlogs, "User blogs fetched successfully.")
-    )
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, userBlogs, "User blogs fetched successfully.")
+      );
   } catch (error) {
-    throw new ApiError(500, error.message || "Internal Server error while fetching blogs by userid.")
+    throw new ApiError(
+      500,
+      error.message || "Internal Server error while fetching blogs by userid."
+    );
   }
 });
 
@@ -507,6 +513,137 @@ const restoreBlog = asyncHandler(async (req, res) => {
     );
   }
 });
+
+const getBlogsByTopLevelCategory = asyncHandler(async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
+
+    if (!mongoose.isValidObjectId(categoryId)) {
+      throw new ApiError(400, "INvalid category ID.");
+    }
+
+    const subCategories = await Category.find({ parent: categoryId });
+    const categoryIds = subCategories.map((sub) => sub._id);
+    categoryIds.push(new mongoose.Types.ObjectId(categoryId));
+
+    const pipeline = [
+      {
+        $match: {
+          categories: { $in: categoryIds },
+          isPublished: true,
+          isDeleted: false,
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "owner",
+          foreignField: "_id",
+          as: "owner",
+          pipeline: [
+            {
+              $project: {
+                username: 1,
+                fullName: 1,
+                avatar: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $unwind: "$owner",
+      },
+    ];
+
+    const blogs = await Blog.aggregatePaginate(Blog.aggregate(pipeline), {
+      page: page,
+      limit: limit,
+    });
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          blogs,
+          "Blogs for category abd sub-categories fetched successfully."
+        )
+      );
+  } catch (error) {
+    throw new ApiError(
+      500,
+      error.message ||
+        "Internal Server Error while fetching blogs from top-level category."
+    );
+  }
+});
+
+const getBlogsBySubCategory = asyncHandler(async (req, res) => {
+  try {
+    const { subCategoryId } = req.params;
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
+
+    if (!mongoose.isValidObjectId(subCategoryId)) {
+      throw new ApiError(400, "Invalid sub-category ID.");
+    }
+
+    const pipeline = [
+      {
+        $match: {
+          categories: { $in: [new mongoose.Types.ObjectId(subCategoryId)] },
+          isPublished: true,
+          isDeleted: false,
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "owner",
+          foreignField: "_id",
+          as: "owner",
+          pipeLine: [
+            {
+              $project: {
+                username: 1,
+                fullName: 1,
+                avatar: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $unwind: "$owner",
+      },
+    ];
+
+    const blogs = await Blog.aggregatePaginate(Blog.aggregate(pipeline), {
+      page: page,
+      limit: limit,
+    });
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          blogs,
+          "Blogs for sub-category fetched successfully."
+        )
+      );
+  } catch (error) {
+    throw new ApiError(
+      500,
+      error.message ||
+        "Internal Server Error during fetching of blog through sub-category."
+    );
+  }
+});
+
 export {
   getBlogs,
   getBlog,
@@ -518,4 +655,6 @@ export {
   toggleBlogStatus,
   deleteBlog, // Export the new delete function
   restoreBlog, // Export the new restore function
+  getBlogsByTopLevelCategory,
+  getBlogsBySubCategory
 };
