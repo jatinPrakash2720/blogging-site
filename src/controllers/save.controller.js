@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
-import { ApiError } from "../utils/ApiError.util";
-import { Save } from "../models/save.model";
-import { asyncHandler } from "../utils/asyncHandler.util";
-import { ApiResponse } from "../utils/ApiResponse.util";
-import { Blog } from "../models/blog.model";
+import { ApiError } from "../utils/ApiError.util.js";
+import { Save } from "../models/save.model.js";
+import { asyncHandler } from "../utils/asyncHandler.util.js";
+import { ApiResponse } from "../utils/ApiResponse.util.js";
+import { Blog } from "../models/blog.model.js";
 
 const createSaveCollection = asyncHandler(async (req, res) => {
   const { name, description } = req.body;

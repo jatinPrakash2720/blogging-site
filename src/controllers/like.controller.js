@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
-import { asyncHandler } from "../utils/asyncHandler.util";
-import { ApiError } from "../utils/ApiError.util";
-import { Blog } from "../models/blog.model";
-import { Like } from "../models/like.model";
-import { ApiResponse } from "../utils/ApiResponse.util";
+import { asyncHandler } from "../utils/asyncHandler.util.js";
+import { ApiError } from "../utils/ApiError.util.js";
+import { Blog } from "../models/blog.model.js";
+import { Like } from "../models/like.model.js";
+import { ApiResponse } from "../utils/ApiResponse.util.js";
 
 const toggleBlogLike = asyncHandler(async (req, res) => {
   const { blogId } = req.params;

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { verifyJWT } from "../middlewares/auth.middleware";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 import {
   createSaveCollection,
   deleteSaveCollection,
@@ -8,7 +8,7 @@ import {
   toggleBlogInCollection,
   updateSaveCollectionDescription,
   updateSaveCollectionName,
-} from "../controllers/save.controller";
+} from "../controllers/save.controller.js";
 
 const router = Router();
 router.use(verifyJWT);

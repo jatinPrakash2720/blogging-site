@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { verifyJWT } from "../middlewares/auth.middleware";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 import {
   getUserFollowers,
   getUserFollowing,
   toggleFollow,
-} from "../controllers/userfollow.controller";
+} from "../controllers/userfollow.controller.js";
 
 const router = Router();
 router.use(verifyJWT);

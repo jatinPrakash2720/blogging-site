@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
-import { asyncHandler } from "../utils/asyncHandler.util";
-import { ApiError } from "../utils/ApiError.util";
-import { UserFollow } from "../models/userFollow.model";
-import { User } from "../models/user.model";
-import { ApiResponse } from "../utils/ApiResponse.util";
+import { asyncHandler } from "../utils/asyncHandler.util.js";
+import { ApiError } from "../utils/ApiError.util.js";
+import { UserFollow } from "../models/userFollow.model.js";
+import { User } from "../models/user.model.js";
+import { ApiResponse } from "../utils/ApiResponse.util.js";
 
 const toggleFollow = asyncHandler(async (req, res) => {
   const { userIdToFollow } = req.params;

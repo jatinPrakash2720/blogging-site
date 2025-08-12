@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 import MongooseDelete from "mongoose-delete";
-import { Category } from "./category.model";
+import { Category } from "./category.model.js";
 
 const blogSchema = new Schema(
   {

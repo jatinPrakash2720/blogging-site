@@ -27,6 +27,6 @@ const saveSchema = new Schema(
   { timestamps: true }
 );
 
-savedSchema.plugin(mongooseDelete, { overrideMethods: "all", deletedAt: true });
+saveSchema.plugin(mongooseDelete, { overrideMethods: "all", deletedAt: true });
 
 export const Save = mongoose.model("Save", saveSchema);

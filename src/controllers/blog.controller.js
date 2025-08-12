@@ -1,14 +1,13 @@
-import { asyncHandler } from "../utils/asyncHandler.util";
-import { ApiResponse } from "../utils/ApiResponse.util";
-import { ApiError } from "../utils/ApiError.util";
-import { Blog } from "../models/blog.model";
-import { User } from "../models/user.model"; // Still not directly used in these, but kept
+import { asyncHandler } from "../utils/asyncHandler.util.js";
+import { ApiResponse } from "../utils/ApiResponse.util.js";
+import { ApiError } from "../utils/ApiError.util.js";
+import { Blog } from "../models/blog.model.js";
 import {
   deleteFromCloudinary,
   uploadOnCloudinary,
-} from "../utils/Cloudinary.util";
-import { IMAGE_FOLDERS } from "../constants";
-import { Category } from "../models/category.model";
+} from "../utils/Cloudinary.util.js";
+import { IMAGE_FOLDERS } from "../constants.js";
+import { Category } from "../models/category.model.js";
 
 const getBlogs = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page, 10) || 1;
@@ -656,5 +655,5 @@ export {
   deleteBlog, // Export the new delete function
   restoreBlog, // Export the new restore function
   getBlogsByTopLevelCategory,
-  getBlogsBySubCategory
+  getBlogsBySubCategory,
 };
