@@ -8,9 +8,13 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon -r dotenv/config src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "add-users": "node src/scripts/add-users.script.js",
+    "add-blogs": "node src/scripts/add-blogs.script.js",
+    "add-categories": "node src/scripts/add-categories.script.js"
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.9.0",
     "nodemon": "^3.1.10",
     "prettier": "^3.6.2"
   },
@@ -27,6 +31,7 @@
     "mongoose": "^8.16.4",
     "mongoose-aggregate-paginate-v2": "^1.1.4",
     "mongoose-delete": "^1.0.2",
-    "multer": "^2.0.2"
+    "multer": "^2.0.2",
+    "param-case": "^3.0.4"
   }
 }
