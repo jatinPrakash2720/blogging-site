@@ -12,8 +12,10 @@ const getSubCategories = (parentId) => {
   return apiClient.get(`/categories/${parentId}/sub-categories`);
 };
 
-const getFilterableSubCategories = (parentId) => {
-  return apiClient.get(`/categories/${parentId}/filterable-subcategories`);
+const getFilterableSubCategories = (parentId, params = { threshold: 5 }) => {
+  return apiClient.get(`/categories/${parentId}/filterable-subcategories`, {
+    params,
+  });
 };
 
 export {
