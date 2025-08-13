@@ -123,8 +123,8 @@ const getSubCategories = asyncHandler(async (req, res) => {
 
 const getFilterableSubCategories = asyncHandler(async (req, res) => {
   const { parentId } = req.params;
-  const threshold = 5;
-  // const threshold = parseInt(req.query.threshold, 10) || 5;
+  // const threshold = 5;
+  const threshold = parseInt(req.query.threshold, 10) || 5;
 
   if (!mongoose.isValidObjectId(parentId)) {
     throw new ApiError(400, "Invalid parent ID.");
