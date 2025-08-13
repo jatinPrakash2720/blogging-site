@@ -10,12 +10,10 @@ import {
   toggleBlogStatus,
   deleteBlog,
   restoreBlog,
-  getUserBlogs,
 } from "../apis/blog.api.js";
-import { getReadHistory } from "../apis/user.api.js";
-import { useAuth } from "./AuthContext.jsx";
+import { getReadHistory, getUserBlogs } from "../apis/user.api.js";
+import { useAuth } from "./auth.context.jsx";
 import { requestHandler } from "../utils/index.js";
-import Loader from "../components/Loader.jsx";
 
 const BlogContext = createContext({
   allBlogs: [],
@@ -120,30 +118,33 @@ export const BlogProvider = ({ children }) => {
     });
   };
 
-  const fetchAllBlogs = useCallback(async (params = {}) => {
-    setError(null);
-    await requestHandler(
-      () => getBlogs(params),
-      setLoading,
-      (data) => {
-        setAllBlogs(data.blogs);
-        updatePagination(data, setPagination);
-      },
-      (err) => {
-        setError(err);
-        setAllBlogs([]);
-        updatePagination({}, setPagination);
-      }
-    );
-  }, []);
+  const fetchAllBlogs = useCallback(
+    async (params = {}) => {
+      setError(null);
+      await requestHandler(
+        () => getBlogs(params),
+        setLoading,
+        (response) => {
+          const { data } = response;
+          setAllBlogs(data.blogs);
+          updatePagination(data, setPagination);
+        },
+        (err) => {
+          setError(err);
+          setAllBlogs([]);
+        }
+      );
+    },
+    [updatePagination]
+  );
 
   const fetchSingleBlog = useCallback(async (blogId) => {
     setError(null);
     await requestHandler(
       () => getBlog(blogId),
       setLoadingSingleBlog,
-      (data) => {
-        setCurrentBlog(data);
+      (response) => {
+        setCurrentBlog(response.data);
       },
       (err) => {
         setError(err);
@@ -158,10 +159,11 @@ export const BlogProvider = ({ children }) => {
     await requestHandler(
       () => createBlog(blogData),
       setLoading,
-      (data) => {
+      (response) => {
+        const newBlog = response.data;
         // Optionally add the new blog to allBlogs or userBlogs if desired
-        setAllBlogs((prev) => [data, ...prev]);
-        setUserBlogs((prev) => [data, ...prev]);
+        setAllBlogs((prev) => [newBlog, ...prev]);
+        setUserBlogs((prev) => [newBlog, ...prev]);
         success = true;
       },
       (err) => {
@@ -177,20 +179,15 @@ export const BlogProvider = ({ children }) => {
     await requestHandler(
       () => updateBlogTitle({ blogId, newTitle }),
       setLoading,
-      (data) => {
+      () => {
+        const updater = (blog) =>
+          blog._id === blogId ? { ...blog, title: newTitle } : blog;
+
         setCurrentBlog((prev) =>
-          prev && prev._id === blogId ? { ...prev, title: newTitle } : prev
+          prev && prev._id === blogId ? updater(prev) : prev
         );
-        setAllBlogs((prev) =>
-          prev.map((blog) =>
-            blog._id === blogId ? { ...blog, title: newTitle } : blog
-          )
-        );
-        setUserBlogs((prev) =>
-          prev.map((blog) =>
-            blog._id === blogId ? { ...blog, title: newTitle } : blog
-          )
-        );
+        setAllBlogs((prev) => prev.map(updater));
+        setUserBlogs((prev) => prev.map(updater));
         success = true;
       },
       (err) => {
@@ -200,13 +197,14 @@ export const BlogProvider = ({ children }) => {
     return success;
   }, []);
 
-  const updateBlogContentAction = useCallback(async ({ blogId, newContent }) => {
+  const updateBlogContentAction = useCallback(
+    async ({ blogId, newContent }) => {
       setError(null);
       let success = false;
       await requestHandler(
         () => updateBlogContent({ blogId, newContent }),
         setLoading,
-        (data) => {
+        () => {
           setCurrentBlog((prev) =>
             prev && prev._id === blogId
               ? { ...prev, content: newContent }
@@ -219,9 +217,12 @@ export const BlogProvider = ({ children }) => {
         }
       );
       return success;
-  }, []);
-  
-  const updateBlogThumbnailAction = useCallback(async ({ blogId, newThumbnailFile }) => {
+    },
+    []
+  );
+
+  const updateBlogThumbnailAction = useCallback(
+    async ({ blogId, newThumbnailFile }) => {
       setError(null);
       let success = false;
 
@@ -234,29 +235,21 @@ export const BlogProvider = ({ children }) => {
       }
 
       await requestHandler(
-        () => updateBlogThumbnail({ blogId, newThumbnail: formData }),
+        () => updateBlogThumbnail({ blogId, thumbnailFormData: formData }),
         setLoading,
-        (data) => {
-          const newThumbnailUrl = data.thumbnail;
+        (response) => {
+          const updatedBlog = response.data;
+          const newThumbnailUrl = updatedBlog.thumbnail;
+
+          const updater = (blog) =>
+            blog._id === blogId
+              ? { ...blog, thumbnail: newThumbnailUrl }
+              : blog;
           setCurrentBlog((prev) =>
-            prev && prev._id === blogId
-              ? { ...prev, thumbnail: newThumbnailUrl }
-              : prev
+            prev && prev._id === blogId ? updater(prev) : prev
           );
-          setAllBlogs((prev) =>
-            prev.map((blog) =>
-              blog._id === blogId
-                ? { ...blog, thumbnail: newThumbnailUrl }
-                : blog
-            )
-          );
-          setUserBlogs((prev) =>
-            prev.map((blog) =>
-              blog._id === blogId
-                ? { ...blog, thumbnail: newThumbnailUrl }
-                : blog
-            )
-          );
+          setAllBlogs((prev) => prev.map(updater));
+          setUserBlogs((prev) => prev.map(updater));
           success = true;
         },
         (err) => {
@@ -264,49 +257,34 @@ export const BlogProvider = ({ children }) => {
         }
       );
       return success;
-  }, []);
-  
+    },
+    []
+  );
+
   const toggleBlogStatusAction = useCallback(async (blogId) => {
     setError(null);
     let success = false;
     await requestHandler(
       () => toggleBlogStatus(blogId),
       setLoading,
-      (data) => {
-        setCurrentBlog((prev) =>
-          prev && prev._id === blogId
+      (response) => {
+        const data = response.data;
+
+        const updater = (blog) =>
+          blog._id === blogId
             ? {
-                ...prev,
+                ...blog,
                 isPublished: data.isPublished,
                 status: data.status,
                 updatedAt: data.updatedAt,
               }
-            : prev
+            : prev;
+
+        setCurrentBlog((prev) =>
+          prev && prev._id === blogId ? updater(prev) : prev
         );
-        setAllBlogs((prev) =>
-          prev.map((blog) =>
-            blog._id === blogId
-              ? {
-                  ...blog,
-                  isPublished: data.isPublished,
-                  status: data.status,
-                  updatedAt: data.updatedAt,
-                }
-              : prev
-          )
-        );
-        setUserBlogs((prev) =>
-          prev.map((blog) =>
-            blog._id === blogId
-              ? {
-                  ...blog,
-                  isPublished: data.isPublished,
-                  status: data.status,
-                  updatedAt: data.updatedAt,
-                }
-              : prev
-          )
-        );
+        setAllBlogs((prev) => prev.map(updater));
+        setUserBlogs((prev) => prev.map(updater));
         success = true;
       },
       (err) => {
@@ -316,7 +294,8 @@ export const BlogProvider = ({ children }) => {
     return success;
   }, []);
 
-  const deleteBlogAction = useCallback(async (blogId) => {
+  const deleteBlogAction = useCallback(
+    async (blogId) => {
       setError(null);
       let success = false;
       await requestHandler(
@@ -334,15 +313,18 @@ export const BlogProvider = ({ children }) => {
           setError(err);
         }
       );
-  }, [currentBlog]);
-  
-  const restoreBlogAction = useCallback(async (blogId) => {
+    },
+    [currentBlog]
+  );
+
+  const restoreBlogAction = useCallback(
+    async (blogId) => {
       setError(null);
       let success = false;
       await requestHandler(
         () => restoreBlog(blogId),
         setLoading,
-        async (data) => {
+        async () => {
           success = true;
           if (currentBlog && currentBlog._id === blogId) {
             await fetchSingleBlog(blogId);
@@ -356,41 +338,49 @@ export const BlogProvider = ({ children }) => {
         }
       );
       return success;
-  }, [currentBlog, currentUser, fetchSingleBlog, fetchUserBlogs, fetchAllBlogs]);
-  
-  const fetchUserBlogs = useCallback(async ({ userId, page = 1, limit = 10, sortBy = "createdAt", sortOrder = "desc",}) => {
+    },
+    [currentBlog, currentUser, fetchSingleBlog, fetchUserBlogs, fetchAllBlogs]
+  );
+
+  const fetchUserBlogs = useCallback(
+    async (params) => {
       setError(null);
       await requestHandler(
-        () => getUserBlogs({ userId, page, limit, sortBy, sortOrder }),
+        () => getUserBlogs(params.userId, params),
         setLoading,
-        (data) => {
+        (response) => {
+          const { data } = response;
           setUserBlogs(data.blogs);
           updatePagination(data, setUserBlogsPagination);
         },
         (err) => {
           setError(err);
           setUserBlogs([]);
-          updatePagination({}, setUserBlogsPagination);
         }
       );
-  }, [updatePagination]);
-  
-  const fetchReadHistory = useCallback(async (params = { page: 1, limit: 10 }) => {
-    setError(null);
-    await requestHandler(
-      () => getReadHistory(params.page, params.limit),
-      setLoading,
-      (data) => {
-        setReadHistory(data.blogs);
-        updatePagination(data, setReadHistoryPagination);
-      },
-      (err) => {
-        setError(err);
-        setReadHistory([]);
-        updatePagination({}, setReadHistoryPagination);
-      }
-    )
-  }, [updatePagination])
+    },
+    [updatePagination]
+  );
+
+  const fetchReadHistory = useCallback(
+    async (params = { page: 1, limit: 10 }) => {
+      setError(null);
+      await requestHandler(
+        () => getReadHistory(params),
+        setLoading,
+        (response) => {
+          const { data } = response;
+          setReadHistory(data.blogs);
+          updatePagination(data, setReadHistoryPagination);
+        },
+        (err) => {
+          setError(err);
+          setReadHistory([]);
+        }
+      );
+    },
+    [updatePagination]
+  );
 
   const clearBlogError = useCallback(() => setError(null), []);
 
@@ -398,17 +388,44 @@ export const BlogProvider = ({ children }) => {
 
   const clearAllBlogs = useCallback(() => {
     setAllBlogs([]);
-    setPagination({ totalDocs: 0, page: 1, limit: 10, totalPages: 1, hasNextPage: false, hasPrevPage: false, nextPage: null, prevPage: null });
+    setPagination({
+      totalDocs: 0,
+      page: 1,
+      limit: 10,
+      totalPages: 1,
+      hasNextPage: false,
+      hasPrevPage: false,
+      nextPage: null,
+      prevPage: null,
+    });
   }, []);
 
   const clearUserBlogs = useCallback(() => {
     setUserBlogs([]);
-    setUserBlogsPagination({ totalDocs: 0, page: 1, limit: 10, totalPages: 1, hasNextPage: false, hasPrevPage: false, nextPage: null, prevPage: null });
+    setUserBlogsPagination({
+      totalDocs: 0,
+      page: 1,
+      limit: 10,
+      totalPages: 1,
+      hasNextPage: false,
+      hasPrevPage: false,
+      nextPage: null,
+      prevPage: null,
+    });
   }, []);
-  
+
   const clearReadHistory = useCallback(() => {
     setReadHistory([]);
-    setReadHistoryPagination({ totalDocs: 0, page: 1, limit: 10, totalPages: 1, hasNextPage: false, hasPrevPage: false, nextPage: null, prevPage: null });
+    setReadHistoryPagination({
+      totalDocs: 0,
+      page: 1,
+      limit: 10,
+      totalPages: 1,
+      hasNextPage: false,
+      hasPrevPage: false,
+      nextPage: null,
+      prevPage: null,
+    });
   }, []);
 
   const contextValue = {
@@ -437,20 +454,18 @@ export const BlogProvider = ({ children }) => {
     clearCurrentBlog,
     clearAllBlogs,
     clearUserBlogs,
-    clearReadHistory
+    clearReadHistory,
   };
-  
+
   if (loading || loadingSingleBlog) {
-    return <Loader />
+    return <Loader />;
   }
 
   return (
-    <BlogContext.Provider value={contextValue}>
-      {children}
-    </BlogContext.Provider>
-  )
+    <BlogContext.Provider value={contextValue}>{children}</BlogContext.Provider>
+  );
 };
 
 export const useBlogs = () => {
   return useContext(BlogContext);
-}
+};

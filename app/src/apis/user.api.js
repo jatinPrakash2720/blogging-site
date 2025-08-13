@@ -1,4 +1,4 @@
-import { apiClient } from "./apiConfig";
+import { apiClient } from "../utils/apiConfig.util.js";
 
 const registerUser = (data) => {
   return apiClient.post("/users/register", data);
@@ -16,7 +16,7 @@ const changeCurrentPassword = (data) => {
   return apiClient.post("/users/change-password", data);
 };
 const getCurrentUser = () => {
-  return apiClient.post("/users/current-user");
+  return apiClient.get("/users/current-user");
 };
 const updateUserFullName = (data) => {
   return apiClient.patch("/users/update-fullname", data);
@@ -31,13 +31,24 @@ const updateUserCoverImage = (coverImage) => {
   return apiClient.patch("/users/update-cover", coverImage);
 };
 const getUserPageProfile = (username) => {
-  return apiClient.post(`/users/c/${username}`);
+  return apiClient.get(`/users/c/${username}`);
 };
-const getReadHistory = (page = 1, limit = 10) => {
-  return apiClient.get("/user/history", {
+const getReadHistory = (params = { page: 1, limit: 10 }) => {
+  return apiClient.get("/users/history", { params });
+};
+const getUserBlogs = ({
+  userId,
+  page = 1,
+  limit = 10,
+  sortBy = "createdAt",
+  sortOrder = "desc",
+}) => {
+  return apiClient.get(`/users/${userId}/blogs`, {
     params: {
       page: page,
       limit: limit,
+      sortBy: sortBy,
+      sortOrder: sortOrder,
     },
   });
 };
@@ -55,4 +66,5 @@ export {
   updateUserCoverImage,
   getUserPageProfile,
   getReadHistory,
+  getUserBlogs,
 };
