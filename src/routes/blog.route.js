@@ -28,7 +28,7 @@ router
 router.route("/:blogId/toggle-status").patch(toggleBlogStatus);
 router.route("/:blogId").delete(deleteBlog);
 router.route("/:blogId/restore").patch(restoreBlog);
-router.route("/by-category/:categotyId").get(getBlogsByTopLevelCategory);
+router.route("/by-category/:categoryId").get(getBlogsByTopLevelCategory);
 router.route("/by-sub-category/:subCategoryId").get(getBlogsBySubCategory);
 
 export default router;

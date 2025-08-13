@@ -29,8 +29,7 @@ router.route("/register").post(authLimiter,
     {
       name: "coverImage",
       maxCount: 1,
-    },
-  ]),
+    },]),
   registerUser
 );
 router.route("/login").post(authLimiter,loginUser);

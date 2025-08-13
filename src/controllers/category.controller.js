@@ -46,6 +46,7 @@ const createSubCategory = asyncHandler(async (req, res) => {
       slug: slug,
       parent: parentId,
       type: "user-defined",
+      description:description,
     });
 
     return res
@@ -120,9 +121,10 @@ const getSubCategories = asyncHandler(async (req, res) => {
   }
 });
 
-const getFilerableSubCategories = asyncHandler(async (req, res) => {
+const getFilterableSubCategories = asyncHandler(async (req, res) => {
   const { parentId } = req.params;
-  const threshold = parseInt(req.query.threshold, 10) || 5;
+  const threshold = 5;
+  // const threshold = parseInt(req.query.threshold, 10) || 5;
 
   if (!mongoose.isValidObjectId(parentId)) {
     throw new ApiError(400, "Invalid parent ID.");
@@ -148,5 +150,5 @@ export {
   createSubCategory,
   getTopLevelCategories,
   getSubCategories,
-  getFilerableSubCategories,
+  getFilterableSubCategories,
 };

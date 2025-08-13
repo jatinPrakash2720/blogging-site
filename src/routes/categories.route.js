@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
   createSubCategory,
-  getFilerableSubCategories,
+  getFilterableSubCategories,
   getSubCategories,
   getTopLevelCategories,
 } from "../controllers/category.controller.js";
@@ -14,7 +14,7 @@ router.route("/top-level").get(getTopLevelCategories);
 router.route("/:parentId/sub-categories").get(getSubCategories);
 router
   .route("/:parentId/filterable-subcategories")
-  .get(getFilerableSubCategories);
+  .get(getFilterableSubCategories);
 router.route("/:parentId/sub-categories").post(createSubCategory);
 
 export default router;
