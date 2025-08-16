@@ -1,6 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.util.js";
 import { ApiResponse } from "../utils/ApiResponse.util.js";
 import { User } from "../models/user.model.js";
+import { Blog } from "../models/blog.model.js";
 import {
   deleteFromCloudinary,
   uploadOnCloudinary,
@@ -287,7 +288,10 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
   if (!avatarLocalPath) {
     throw new ApiError(400, "Avatar file is missing");
   }
-  const avatar = await uploadOnCloudinary(avatarLocalPath,IMAGE_FOLDERS.AVATAR);
+  const avatar = await uploadOnCloudinary(
+    avatarLocalPath,
+    IMAGE_FOLDERS.AVATAR
+  );
 
   if (!avatar.url) {
     throw new ApiError(408, "Error while uploading on Cloudinary");
@@ -309,7 +313,10 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
   if (!coverImageLocalPath) {
     throw new ApiError(400, "Cover Image file is missing");
   }
-  const coverImage = await uploadOnCloudinary(coverImageLocalPath,IMAGE_FOLDERS.COVER);
+  const coverImage = await uploadOnCloudinary(
+    coverImageLocalPath,
+    IMAGE_FOLDERS.COVER
+  );
 
   if (!coverImage.url) {
     throw new ApiError(408, "Error while uploading on Cloudinary");
