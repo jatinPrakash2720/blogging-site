@@ -1,6 +1,6 @@
 import React from "react";
-import Avatar from "@/components/common/Avatar";
-import Button from "@/components/common/Button";
+import Avatar from "@/components/common/wrappers/Avatar";
+import Button from "@/components/common/wrappers/Button";
 // import type { User } from "@/types"; // Assuming a User type exists
 
 interface UserCardProps {

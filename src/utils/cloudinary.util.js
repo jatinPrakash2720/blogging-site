@@ -13,7 +13,7 @@ const uploadOnCloudinary = async (localFilePath, folder) => {
     const filename = `${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     const publicId = folder ? `${folder}/${filename}` : filename;
 
-    const response = await cloudinary.v2.uploader.upload(localFilePath, {
+    const response = await cloudinary.uploader.upload(localFilePath, {
       public_id: publicId,
       resource_type: "auto",
     });
@@ -36,7 +36,7 @@ const deleteFromCloudinary = async (imageUrl) => {
     if (!imageUrl) return null;
     const publicId = imageUrl.split("/").pop().split(".")[0];
 
-    const response = await cloudinary.v2.uploader.destroy(publicId, {
+    const response = await cloudinary.uploader.destroy(publicId, {
       resource_type: "image",
     });
     console.log("File deleted from Cloudinary ");

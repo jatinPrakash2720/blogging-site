@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.util.js";
 import { ApiResponse } from "../utils/ApiResponse.util.js";
 import { ApiError } from "../utils/ApiError.util.js";
 import { Blog } from "../models/blog.model.js";
+import { UserFollow } from "../models/userFollow.model.js";
 import {
   deleteFromCloudinary,
   uploadOnCloudinary,
@@ -21,7 +22,7 @@ const getBlogs = asyncHandler(async (req, res) => {
     $match: {
       isPublished: true,
       // NEW: Ensure only non-deleted blogs are fetched for the public list
-      isDeleted: false,
+      deleted: { $ne: true },
     },
   });
   if (searchQuery) {
@@ -643,6 +644,48 @@ const getBlogsBySubCategory = asyncHandler(async (req, res) => {
   }
 });
 
+const getFollowingFeed = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 10;
+
+  // 1. Find all users that the current user is following
+  const following = await UserFollow.find({ followerId: userId }).select(
+    "followingId"
+  );
+  const followingIds = following.map((f) => f.followingId);
+
+  // 2. Find all blogs where the owner is in the list of followed users
+  const blogsAggregate = Blog.aggregate([
+    {
+      $match: {
+        owner: { $in: followingIds },
+        isPublished: true,
+        isDeleted: false,
+      },
+    },
+    { $sort: { createdAt: -1 } },
+    // You can add the same $lookup and $project stages from your getBlogs controller
+    // to populate author details and select specific fields.
+  ]);
+
+  const paginatedBlogs = await Blog.aggregatePaginate(blogsAggregate, {
+    page,
+    limit,
+    customLabels: { docs: "blogs" },
+  });
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        paginatedBlogs,
+        "Following feed fetched successfully."
+      )
+    );
+});
+
 export {
   getBlogs,
   getBlog,
@@ -656,4 +699,5 @@ export {
   restoreBlog, // Export the new restore function
   getBlogsByTopLevelCategory,
   getBlogsBySubCategory,
+  getFollowingFeed,
 };

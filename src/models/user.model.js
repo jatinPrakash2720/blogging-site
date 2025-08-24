@@ -1,6 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import crypto from "crypto"; 
 import MongooseDelete from "mongoose-delete";
 
 
@@ -43,24 +44,34 @@ const userSchema = new Schema(
         ref: "Blog",
       },
     ],
+    googleId: {
+      type:String,
+    },
     password: {
       type: String,
-      required: [true, "password is required"],
+      required: function () { return !this.googleId; },
     },
     refreshToken: {
       type: String,
     },
+    forgotPasswordToken: String,
+    forgotPasswordExpiry:Date,
   },
   { timestamps: true }
 );
 
 userSchema.pre("save", async function (next) {
+  console.log("--- PRE-SAVE HOOK TRIGGERED ---"); // <-- Add this line
+  console.log("Is password modified?", this.isModified("password")); // <-- And this line
   if (!this.isModified("password")) return next();
+  // ✅ Corrected: Added 'await' to wait for the hashing to finish
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
 userSchema.methods.isPasswordCorrect = async function (password) {
+  console.log(password);
+  console.log(this.password);
   return await bcrypt.compare(password, this.password);
 };
 
@@ -90,5 +101,14 @@ userSchema.methods.generateRefreshToken = function () {
   );
 };
 
+userSchema.methods.generatePasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(20).toString("hex");
+
+  this.forgotPasswordToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+  
+  this.forgotPasswordExpiry = Date.now() + 10 * 60 * 1000; //TOken expires in 10 minutes
+
+  return resetToken;
+}
 userSchema.plugin(MongooseDelete, { overrideMethods: "all", deleteAt: true });
 export const User = mongoose.model("User", userSchema);

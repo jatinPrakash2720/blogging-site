@@ -5,13 +5,13 @@ import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import Button from "@/components/common/Button";
-import {Calendar} from "@/components/common/Calendar";
+import Button from "@/components/common/wrappers/Button";
+import { Calendar } from "@/components/common/wrappers/Calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/common/Popover";
+} from "@/components/common/wrappers/Popover";
 
 const DatePicker = React.forwardRef<
   HTMLDivElement,

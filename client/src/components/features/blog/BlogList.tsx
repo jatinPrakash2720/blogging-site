@@ -1,30 +1,31 @@
-import React from "react";
+import type React from "react";
 import BlogCard from "./BlogCard";
-// import type { Blog } from "@/types"; // Assuming a central Blog type exists
+import type { LayoutType } from "../../common/subComps/layout-toggle";
 
 interface BlogListProps {
-  blogs: any[]; // Using 'any' for now to match the mock data in HomePage.tsx
+  blogs: any[];
+  layout?: LayoutType;
 }
 
-const BlogList: React.FC<BlogListProps> = ({ blogs }) => {
-  // A placeholder for when there are no blogs to display
+const BlogList: React.FC<BlogListProps> = ({ blogs, layout = "square" }) => {
   if (!blogs || blogs.length === 0) {
     return (
-      <div className="text-center py-12">
+      <div className="text-center py-20">
         <h2 className="text-xl font-semibold">No posts found</h2>
         <p className="text-gray-500 mt-2">Check back later for new articles!</p>
       </div>
     );
   }
 
+  const gridClasses =
+    layout === "landscape"
+      ? "grid grid-cols-1 gap-8 justify-items-center"
+      : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center";
+
   return (
-    // This creates a responsive grid that shows:
-    // - 1 column on small screens
-    // - 2 columns on medium screens (tablets)
-    // - 3 columns on large screens (desktops)
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div className={`${gridClasses}`}>
       {blogs.map((blog) => (
-        <BlogCard key={blog._id} blog={blog} />
+        <BlogCard layout={layout} key={blog._id} blog={blog} />
       ))}
     </div>
   );

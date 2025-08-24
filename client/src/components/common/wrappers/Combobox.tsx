@@ -4,7 +4,7 @@ import * as React from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import Button from "@/components/common/Button";
+import Button from "@/components/common/wrappers/Button";
 import {
   Command,
   CommandEmpty,
@@ -12,12 +12,12 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/common/Command";
+} from "@/components/common/wrappers/Command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/common/Popover";
+} from "@/components/common/wrappers/Popover";
 
 interface ComboboxProps {
   options: { value: string; label: string }[];

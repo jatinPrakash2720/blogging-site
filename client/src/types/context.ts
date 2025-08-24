@@ -15,7 +15,10 @@ import type {
   SaveCollection,
   CreateSaveCollectionPayload,
   UpdateSaveCollectionPayload,
-  Comment
+  Comment,
+  ForgotPasswordPayload,
+  ResetPasswordPayload
+
 } from "../types/api.ts";
 import type { ReactNode } from "react";
 
@@ -33,6 +36,11 @@ export interface IAuthContext {
   updateProfile: (
     updateData: FormData | { fullName?: string; email?: string }
   ) => Promise<void>;
+  forgotPassword: (payload: ForgotPasswordPayload) => Promise<boolean>;
+  restorePassword: (
+    token: string,
+    payload: ResetPasswordPayload
+  ) => Promise<boolean>;
   clearAuthError: () => void;
 }
 
@@ -51,6 +59,8 @@ export interface IBlogContext {
   pagination: PaginatedBlogResponse | null;
   userBlogsPagination: PaginatedBlogResponse | null;
   readHistoryPagination: PaginatedBlogResponse | null;
+  feedBlogs: Blog[];
+  feedPagination: PaginatedBlogResponse | null;
   fetchAllBlogs: (params?: GetBlogsParams) => Promise<void>;
   fetchSingleBlog: (blogId: string) => Promise<void>;
   createNewBlog: (blogData: FormData) => Promise<boolean>;
@@ -67,6 +77,7 @@ export interface IBlogContext {
   restoreBlogAction: (blogId: string) => Promise<boolean>;
   fetchUserBlogs: (params: GetUserBlogsParams) => Promise<void>;
   fetchReadHistory: (params?: PaginationParams) => Promise<void>;
+  fetchFollowingFeed: (params?: GetBlogsParams) => Promise<void>;
 }
 
 export interface BlogProviderProps {

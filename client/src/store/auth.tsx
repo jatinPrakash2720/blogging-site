@@ -12,7 +12,9 @@ import { LocalStorage, requestHandler } from "../lib/index.ts";
 import type { IAuthContext, AuthProviderProps } from "../types/context.ts";
 import type {
   ChangePasswordData,
+  ForgotPasswordPayload,
   LoginCredentials,
+  ResetPasswordPayload,
   User,
 } from "../types/api.ts";
 
@@ -75,12 +77,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await requestHandler(
         () => userService.loginUser(credentials),
         setLoading,
-        (response) => {
-          const { user, accessToken } = response.data;
+        (response: { user: User; accessToken: string }) => {
+          const { user, accessToken } = response;
           setCurrentUser(user);
+
           setIsAuthenticated(true);
+
           LocalStorage.set("token", accessToken);
+
           LocalStorage.set("user", user);
+
           navigate("/");
         },
         setError
@@ -186,6 +192,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     [fetchCurrentUser]
   );
 
+  const forgotPassword = useCallback(async (payload: ForgotPasswordPayload) => {
+    
+    let success = false;
+    await requestHandler(
+      () => userService.forgotPassword(payload),
+      setLoading,
+      () => {
+        success = true;
+      },
+      setError
+    );
+    return success;
+  }, []);
+
+  const restorePassword = useCallback(async (token: string, payload: ResetPasswordPayload) => {
+    let success = false;
+    await requestHandler(
+      () => userService.restorePassword(token, payload),
+      setLoading,
+      () => {
+        success = true;
+        navigate("/login");
+      },
+      setError
+    );
+    return success;
+  }, [navigate]);
+
+
   const clearAuthError = useCallback(() => {
     setError(null);
   }, []);
@@ -202,6 +237,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     refreshAuthToken,
     changePassword,
     updateProfile,
+    forgotPassword,
+    restorePassword,
     clearAuthError,
   };
 

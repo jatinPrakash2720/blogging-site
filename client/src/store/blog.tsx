@@ -26,6 +26,8 @@ export const BlogProvider: React.FC<contextInterfaces.BlogProviderProps> = ({
   const [currentBlog, setCurrentBlog] = useState<Blog | null>(null);
   const [userBlogs, setUserBlogs] = useState<Blog[]>([]);
   const [readHistory, setReadHistory] = useState<Blog[]>([]);
+  const [feedBlogs, setFeedBlogs] = useState<Blog[]>([]);
+  const [feedPagination, setFeedPagination] = useState<apiInterfaces.PaginatedBlogResponse | null>(null);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingSingleBlog, setLoadingSingleBlog] = useState<boolean>(false);
@@ -57,8 +59,11 @@ export const BlogProvider: React.FC<contextInterfaces.BlogProviderProps> = ({
         () => blogService.getBlogs(params),
         setLoading,
         (response) => {
-          const { data } = response;
-          setAllBlogs(data.blogs);
+          console.log(response);
+          const { blogs } = response;
+          // console.log(data);
+          console.log(blogs);
+          setAllBlogs(blogs);
           updatePaginationState(data, setPagination);
         },
         setError
@@ -264,6 +269,21 @@ export const BlogProvider: React.FC<contextInterfaces.BlogProviderProps> = ({
     },
     [updatePaginationState]
   );
+  const fetchFollowingFeed = useCallback(
+    async (params: apiInterfaces.GetBlogsParams = {}) => {
+      await requestHandler(
+        () => blogService.getFollowingFeed(params),
+        setLoading,
+        (response) => {
+          // const { data } = response;
+          setFeedBlogs(response.blogs);
+          updatePaginationState(response, setFeedPagination);
+        },
+        setError
+      );
+    },
+    [updatePaginationState]
+  );
 
   const contextValue: contextInterfaces.IBlogContext = {
     allBlogs,
@@ -276,6 +296,8 @@ export const BlogProvider: React.FC<contextInterfaces.BlogProviderProps> = ({
     pagination,
     userBlogsPagination,
     readHistoryPagination,
+    feedBlogs,
+    feedPagination,
     fetchAllBlogs,
     fetchSingleBlog,
     createNewBlog,
@@ -287,6 +309,8 @@ export const BlogProvider: React.FC<contextInterfaces.BlogProviderProps> = ({
     toggleBlogStatusAction,
     deleteBlogAction,
     restoreBlogAction,
+
+    fetchFollowingFeed,
   };
 
   return (

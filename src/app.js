@@ -1,22 +1,30 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import helmet from "helmet";
+import passport from "passport";
+import { configurePassport } from "./utils/passport.util.js";
 
 const app = express();
-app.use(helmet());
+
+// Dynamic CORS handling for development
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(",")
+  : ["http://localhost:3000", "http://192.168.29.109:3000"];
 
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "*",
+    origin: process.env.CORS_ORIGIN.split(",")[1],
     credentials: true,
   })
 );
+
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
 app.use(cookieParser());
 
+configurePassport();
+app.use(passport.initialize());
 //routes import
 import userRouter from "./routes/user.route.js";
 app.use("/api/v1/users", userRouter);
@@ -39,8 +47,8 @@ app.use("/api/v1/likes", likeRouter);
 import commentRouter from "./routes/comment.route.js";
 app.use("/api/v1/comments", commentRouter);
 
-import { apiLimiter } from "./middlewares/ratelimiter.middleware.js";
-app.use("/api", apiLimiter);
+// import { apiLimiter } from "./middlewares/ratelimiter.middleware.js";
+// app.use("/api", apiLimiter);
 
 //centrailized error control
 import { ApiError } from "./utils/ApiError.util.js";

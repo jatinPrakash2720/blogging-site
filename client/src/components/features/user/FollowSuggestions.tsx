@@ -5,7 +5,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/components/common/Card";
+} from "@/components/common/wrappers/Card";
 
 // Mock data for demonstration
 const mockUsersToFollow = [
@@ -31,7 +31,7 @@ const mockUsersToFollow = [
 
 const FollowSuggestions: React.FC = () => {
   return (
-    <Card>
+    <Card className=" sticky top-50">
       <CardHeader>
         <CardTitle className="text-lg">Who to follow</CardTitle>
       </CardHeader>

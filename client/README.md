@@ -1,69 +1,148 @@
-# React + TypeScript + Vite
+# AI Blogging Platform - Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern React-based blogging platform with AI-powered features and comprehensive authentication flow.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- ✨ AI-Powered Writing Assistant
+- 🔍 Smart Content Discovery
+- 📊 Analytics Dashboard
+- 🔐 Complete Authentication Flow
+- 📱 Responsive Design
+- 🌙 Dark Mode Support
 
-## Expanding the ESLint configuration
+## Authentication Flow
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+The application includes a complete authentication system with the following flow:
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Navigation Structure
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+Home Page (/)
+├── Sign In (/signin)
+└── Forgot Password Flow (/forgot-password)
+    ├── Forgot Password Form
+    ├── Account Search
+    └── OTP Verification
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Auth Components
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1. **SignIn** (`/signin`)
+   - Email and password login
+   - Navigation to forgot password flow
+   - Clean, modern UI with loading states
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+2. **ForgotPasswordRoute** (`/forgot-password`)
+   - Manages the complete password reset flow
+   - Uses `AuthLayout` for state management
+   - Seamless navigation between auth steps
+
+3. **AuthLayout**
+   - Central state management for auth flow
+   - Handles navigation between:
+     - Forgot Password Form
+     - Account Search
+     - OTP Verification
+   - Maintains user data across steps
+
+### Auth Flow Steps
+
+1. **Forgot Password Form**
+   - User enters email address
+   - Validates email format
+   - Shows success/error states
+   - Option to search for account
+
+2. **Account Search**
+   - Search by email or username
+   - Real-time validation
+   - Auto-redirect on success
+   - Back navigation to forgot password
+
+3. **OTP Verification**
+   - 6-digit code input
+   - Auto-focus and navigation
+   - Resend functionality with cooldown
+   - Success/error handling
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- npm or yarn
+
+### Installation
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Run linting
+npm run lint
 ```
+
+### Development
+
+The application uses:
+
+- **React 19** with TypeScript
+- **React Router** for navigation
+- **Tailwind CSS** for styling
+- **Radix UI** for components
+- **Lucide React** for icons
+
+### Project Structure
+
+```
+src/
+├── components/
+│   ├── ui/           # Reusable UI components
+│   ├── layout/       # Layout components
+│   └── features/     # Feature-specific components
+├── pages/
+│   ├── auth/         # Authentication pages
+│   └── HomePage.tsx  # Main landing page
+├── lib/              # Utility functions
+├── store/            # State management
+├── types/            # TypeScript definitions
+└── services/         # API services
+```
+
+## API Integration
+
+The auth components are ready for API integration. Replace the TODO comments in:
+
+- `ForgotPasswordRoute.tsx`
+- `Signin.tsx`
+
+With actual API calls to your backend services.
+
+## Styling
+
+The application uses a modern design system with:
+
+- Glass morphism effects
+- Smooth animations
+- Responsive layouts
+- Dark mode support
+- Consistent spacing and typography
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## License
+
+MIT License - see LICENSE file for details

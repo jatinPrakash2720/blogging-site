@@ -10,78 +10,71 @@ import { generateAccessAndRefreshToken } from "../utils/genAccessAndRefreshToken
 import { ApiError } from "../utils/ApiError.util.js";
 import jwt from "jsonwebtoken";
 import { IMAGE_FOLDERS } from "../constants.js";
-
+import { sendEmail } from "../utils/mailer.util.js";
+import crypto from "crypto";
+import bcrypt from "bcrypt"; 
 const option = {
   httpOnly: true,
   secure: true,
 };
 const registerUser = asyncHandler(async (req, res) => {
-  try {
-    //
-    const { username, fullName, email, password } = req.body;
+  const { username, fullName, email, password } = req.body;
 
-    if (
-      [fullName, username, email, password].some(
-        (field) => field?.trim() === ""
-      )
-    ) {
-      throw new ApiError(400, "All fields are required");
-    }
-    const existedUser = await User.findOne({
-      $or: [{ username }, { email }],
-    });
-    if (existedUser) {
-      throw new ApiError(409, "User with email or username already exists");
-    }
-    const avatarLocalPath = req.files?.avatar[0]?.path;
-    let coverImageLocalPath;
-    if (
-      req.files &&
-      Array.isArray(req.files.coverImage) &&
-      req.files.coverImage.length > 0
-    ) {
-      coverImageLocalPath = req.files.coverImage[0].path;
-    }
+  if (
+    [fullName, username, email, password].some((field) => field?.trim() === "")
+  ) {
+    throw new ApiError(400, "All fields are required");
+  }
 
-    if (!avatarLocalPath) {
-      throw new ApiError(400, "Avatar File is required");
-    }
-    const avatar = await uploadOnCloudinary(
-      avatarLocalPath,
-      IMAGE_FOLDERS.AVATAR
-    );
-    const coverImage = await uploadOnCloudinary(
+  const existedUser = await User.findOne({ $or: [{ username }, { email }] });
+  if (existedUser) {
+    throw new ApiError(409, "User with email or username already exists");
+  }
+
+  const avatarLocalPath = req.files?.avatar?.[0]?.path;
+  const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
+
+  if (!avatarLocalPath) {
+    throw new ApiError(400, "Avatar file is required");
+  }
+
+  const avatar = await uploadOnCloudinary(
+    avatarLocalPath,
+    IMAGE_FOLDERS.AVATAR
+  );
+  if (!avatar) {
+    throw new ApiError(500, "Avatar upload failed. Please try again.");
+  }
+
+  // Only upload cover image if a path exists
+  let coverImage = null;
+  if (coverImageLocalPath) {
+    coverImage = await uploadOnCloudinary(
       coverImageLocalPath,
       IMAGE_FOLDERS.COVER
     );
-
-    if (!avatar) {
-      throw new ApiError(400, "Avatar file is required");
-    }
-    const user = await User.create({
-      fullName: fullName,
-      avatar: avatar.url,
-      coverImage: coverImage?.url || "",
-      email: email,
-      username: username.toLowerCase(),
-      password: password,
-    });
-    const createdUser = await User.findById(user._id).select(
-      "-password -refreshToken"
-    );
-
-    if (!createdUser) {
-      throw new ApiError(
-        500,
-        "Something went wrong while registering the user"
-      );
-    }
-    return res
-      .status(201)
-      .json(new ApiResponse(201, createdUser, "User registered successfully!"));
-  } catch (error) {
-    throw new ApiError(500, error?.message || "Internal Error");
   }
+
+  const user = await User.create({
+    fullName,
+    avatar: avatar.url,
+    coverImage: coverImage?.url || "", // Safely access the URL
+    email,
+    username: username.toLowerCase(),
+    password,
+  });
+
+  const createdUser = await User.findById(user._id).select(
+    "-password -refreshToken"
+  );
+
+  if (!createdUser) {
+    throw new ApiError(500, "Something went wrong while registering the user");
+  }
+
+  return res
+    .status(201)
+    .json(new ApiResponse(201, createdUser, "User registered successfully!"));
 });
 const loginUser = asyncHandler(async (req, res) => {
   /*
@@ -94,19 +87,18 @@ const loginUser = asyncHandler(async (req, res) => {
   aur cookies mein kr denge, with options
   */
   try {
-    const { username, email, password } = req.body;
-
-    if (!(username || email)) {
-      throw new ApiError(400, "username or email is required");
+    const { email, password } = req.body;
+    console.log(password);
+    if (!email) {
+      throw new ApiError(400, "email is required");
     }
-    const user = await User.findOne({
-      $or: [{ username }, { email }],
-    });
+    const user = await User.findOne({ email });
+    console.log(user);
     if (!user) {
       throw new ApiError(404, "User does not exists");
     }
     const isPasswordValid = await user.isPasswordCorrect(password);
-
+    console.log(isPasswordValid);
     if (!isPasswordValid) {
       throw new ApiError(401, "Invalid user credentials");
     }
@@ -138,7 +130,7 @@ const loginUser = asyncHandler(async (req, res) => {
         )
       );
   } catch (error) {
-    throw new ApiError(500, "Internal Error while signing");
+    throw new ApiError(501, "Internal Error while signing");
   }
 });
 const logoutUser = asyncHandler(async (req, res) => {
@@ -514,6 +506,100 @@ const getReadHistory = asyncHandler(async (req, res) => {
     },
   ]);*/
 });
+const loginWithGoogle = asyncHandler(async (req, res) => {
+  const user = req.user;
+  const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+    user._id
+  );
+  const redirectOrigin = process.env.CORS_ORIGIN.split(",")[1];
+
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, option)
+    .cookie("refreshToken", refreshToken, option)
+    .redirect(redirectOrigin);
+});
+const forgotPassword = asyncHandler(async (req, res) => {
+  const { identifier } = req.body;
+  if (!identifier) {
+    throw new ApiError(400, "Email or username is required");
+  }
+
+  const user = await User.findOne({
+    $or: [{ email: identifier }, { username: identifier }],
+  });
+  if (!user) {
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          {},
+          "If an account with that identifier exists, a reset link has been sent."
+        )
+      );
+  }
+
+  const resetToken = user.generatePasswordResetToken();
+  await user.save({ validateBeforeSave: false });
+
+  const resetUrl = `${process.env.CORS_ORIGIN.split(",")[1]}/restore-password/${resetToken}`;
+  const message = `You requested a password reset. Plic click this link to reset your password: \n\n ${resetUrl} \n\nIf you did not request this, ignore this email.`;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: "Password Reset Token",
+      message,
+    });
+    res.status(200).json(new ApiResponse(200, {}, "Token sent to email!"));
+  } catch (error) {
+    user.forgotPasswordToken = undefined;
+    user.forgotPasswordExpiry = undefined;
+    await user.save({ validateBeforeSave: false });
+    throw new ApiError(500, error.message || "Email could not be sent");
+  }
+});
+
+const restorePassword = asyncHandler(async (req, res) => {
+  const { password } = req.body;
+
+  if (!password) {
+    throw new ApiError(400, "Password is required");
+  }
+
+  // 1. Find the user by the hashed token
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
+
+  const user = await User.findOne({
+    forgotPasswordToken: hashedToken,
+    forgotPasswordExpiry: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    throw new ApiError(401, "Token is invalid or has expired");
+  }
+
+  // 2. Manually hash the new password
+  // const hashedPassword = await bcrypt.hash(password, 10);
+  console.log(password);
+  // 3. Update the user directly in the database
+  user.password = password;
+  user.forgotPasswordToken = undefined;
+  user.forgotPasswordExpiry = undefined;
+
+  await user.save({ validateBeforeSave: false });
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, {}, "Password reset successfully. Please log in.")
+    );
+});
+
 export {
   registerUser,
   loginUser,
@@ -527,4 +613,7 @@ export {
   updateUserCoverImage,
   getUserPageProfile,
   getReadHistory,
+  loginWithGoogle,
+  forgotPassword,
+  restorePassword,
 };

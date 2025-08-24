@@ -1,13 +1,16 @@
 import { Router } from "express";
 import {
   changeCurrentPassword,
+  forgotPassword,
   getCurrentUser,
   getReadHistory,
   getUserPageProfile,
   loginUser,
+  loginWithGoogle,
   logoutUser,
   refreshAccessToken,
   registerUser,
+  restorePassword,
   updateUserAvatar,
   updateUserCoverImage,
   updateUserEmail,
@@ -16,11 +19,12 @@ import {
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { getBlogsByUserId } from "../controllers/blog.controller.js";
-import { authLimiter } from "../middlewares/ratelimiter.middleware.js";
+// import { authLimiter } from "../middlewares/ratelimiter.middleware.js";
+import passport from "passport";
 const router = Router();
 // console.log("User routes loaded");
 
-router.route("/register").post(authLimiter,
+router.route("/register").post(
   upload.fields([
     {
       name: "avatar",
@@ -32,7 +36,7 @@ router.route("/register").post(authLimiter,
     },]),
   registerUser
 );
-router.route("/login").post(authLimiter,loginUser);
+router.route("/login").post(loginUser);
 router.route("/logout").get(verifyJWT, logoutUser);
 router.route("/refresh-token").post(refreshAccessToken);
 router.route("/change-password").post(verifyJWT, changeCurrentPassword);
@@ -48,5 +52,17 @@ router
 router.route("/c/:username").get(verifyJWT, getUserPageProfile);
 router.route("/history").get(verifyJWT, getReadHistory);
 router.route("/:userId/blogs").get(verifyJWT, getBlogsByUserId);
+router.route("/google").get(passport.authenticate("google", { scope: ["profile", "email"] }));
+router.route("/google/callback").get(
+  passport.authenticate("google", {
+    session: false,
+    failureRedirect: `${process.env.CORS_ORIGIN.split(",")[1]}/login`,
+  }),
+  loginWithGoogle
+);
+router.route("/forgot-password").post(forgotPassword);
+router.route("/restore-password/:token").post(restorePassword);
 // router.route("/login").post(registerUser);
+
+
 export default router;

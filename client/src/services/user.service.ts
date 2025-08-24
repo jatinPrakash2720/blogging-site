@@ -11,7 +11,7 @@ export const registerUser = (data: FormData) => {
 
 export const loginUser = (data: apiInterfaces.LoginCredentials) => {
   return apiClient.post<
-    ApiResponse<{ data: { user: apiInterfaces.User; accessToken: string } }>
+    ApiResponse<{ user: apiInterfaces.User; accessToken: string }>
   >("/users/login", data);
 };
 
@@ -77,3 +77,11 @@ export const getUserBlogs = ({
     params,
   });
 };
+
+export const forgotPassword = (data: apiInterfaces.ForgotPasswordPayload) => {
+  return apiClient.post("/users/forgot-password", data);
+}
+
+export const restorePassword = (token: string, data: apiInterfaces.ResetPasswordPayload) => {
+  return apiClient.post(`/users/restore-password/${token}`, data);
+}

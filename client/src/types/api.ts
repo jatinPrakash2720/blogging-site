@@ -71,6 +71,15 @@ export interface PaginationParams {
   limit?: number;
 }
 
+export interface ForgotPasswordPayload {
+  identifier: string;
+}
+
+export interface ResetPasswordPayload {
+  password?: string;
+  confirmPassword?: string;
+}
+
 // Blog Services
 export interface GetUserBlogsParams extends PaginationParams {
   userId: string;
@@ -83,9 +92,12 @@ export interface PaginatedBlogResponse {
   totalDocs: number;
   limit: number;
   page: number;
+  nextPage: number;
+  prevPage: number;
   totalPages: number;
   hasNextPage: boolean;
   hasPrevPage: boolean;
+  pagingCounter: number;
 }
 
 export interface GetBlogsParams extends PaginationParams {

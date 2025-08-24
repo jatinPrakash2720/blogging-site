@@ -7,6 +7,7 @@ import {
   getBlogs,
   getBlogsBySubCategory,
   getBlogsByTopLevelCategory,
+  getFollowingFeed,
   restoreBlog,
   toggleBlogStatus,
   updateBlogContent,
@@ -30,5 +31,6 @@ router.route("/:blogId").delete(deleteBlog);
 router.route("/:blogId/restore").patch(restoreBlog);
 router.route("/by-category/:categoryId").get(getBlogsByTopLevelCategory);
 router.route("/by-sub-category/:subCategoryId").get(getBlogsBySubCategory);
+router.route("/feed/following").get(getFollowingFeed);
 
 export default router;
