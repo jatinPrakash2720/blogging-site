@@ -2,13 +2,15 @@
 
 import type React from "react";
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
-import "./auth.css";
+import { Eye, EyeOff, User, Mail, Lock, Shield, FileText } from "lucide-react";
 import { continueWithGoogle } from "@/lib/auth";
 import { GlassInputWrapper } from "@/components/common/subComps/GlassInputWrapper";
-import { TestimonialCard } from "@/components/common/subComps/TestimonialCard";
 import type { SignUpPageProps } from "@/types/components/features/auth";
 import { GoogleIcon } from "@/components/icons/GoogleIcon";
+import FocusTrackingInput from "@/components/common/wrappers/FocusTrackingInput";
+import Button from "@/components/common/wrappers/Button";
+import Checkbox from "@/components/common/wrappers/Checkbox";
+import { useTheme } from "@/store/theme";
 
 export const SignUpPage: React.FC<SignUpPageProps> = ({
   title = (
@@ -22,30 +24,42 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({
   onSignUp,
   onSignIn,
 }) => {
+  const theme = useTheme();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   return (
-    <div className="min-h-[100dvh] flex flex-col md:flex-row font-sans w-[100dvw]">
+    <div className="h-screen flex flex-col md:flex-row font-sans w-screen bg-transparent">
+      {/* Right column: hero image + testimonials */}
+      {heroImageSrc && (
+        <section className="hidden md:block flex-1 relative p-4">
+          <div
+            className="animate-app-zoom-in duration-[0.5s] absolute inset-4 rounded-3xl bg-cover bg-center "
+            style={{ backgroundImage: `url(${heroImageSrc})` }}
+          ></div>
+        </section>
+      )}
       {/* Left column: sign-up form */}
-      <section className="flex-1 flex items-center justify-center p-8">
+      <section className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          <div className="flex flex-col gap-6">
-            <h1 className="animate-element animate-delay-100 text-4xl md:text-5xl font-semibold leading-tight">
+          <div className="flex flex-col gap-4">
+            <h1 className="animate-app-fade-in duration-[0.1s] text-4xl md:text-5xl font-semibold leading-tight">
               {title}
             </h1>
-            <p className="animate-element animate-delay-200 text-muted-foreground">
+            <p className="animate-app-fade-in duration-[0.2s]  text-muted-foreground">
               {description}
             </p>
 
-            <form className="space-y-5" onSubmit={onSignUp}>
-              <div className="animate-element animate-delay-300 grid grid-cols-2 gap-4">
+            <form className="space-y-4" onSubmit={onSignUp}>
+              <div className="animate-app-fade-in duration-[0.3s] grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                  <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                    <User className="w-4 h-4" />
                     Username <span className="text-red-500">*</span>
                   </label>
                   <GlassInputWrapper>
-                    <input
+                    <FocusTrackingInput
+                      fieldName="add-username"
                       name="username"
                       type="text"
                       placeholder="Choose a unique username"
@@ -56,48 +70,54 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                  <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                    <User className="w-4 h-4" />
                     Full Name <span className="text-red-500">*</span>
                   </label>
                   <GlassInputWrapper>
-                    <input
+                    <FocusTrackingInput
+                      fieldName="add-fullname"
                       name="fullName"
                       type="text"
                       placeholder="Enter your full name"
-                      className="w-full bg-transparent text-sm p-4 rounded-2xl focus:outline-none"
+                      className="w-full h-13  bg-transparent text-sm p-4 rounded-2xl focus:outline-none"
                       required
                     />
                   </GlassInputWrapper>
                 </div>
               </div>
 
-              <div className="animate-element animate-delay-400">
-                <label className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+              <div className="animate-app-fade-in duration-[0.4s]">
+                <label className=" text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  <Mail className="w-4 h-4" />
                   Email Address <span className="text-red-500">*</span>
                 </label>
                 <GlassInputWrapper>
-                  <input
+                  <FocusTrackingInput
+                    fieldName="add-email"
                     name="email"
                     type="email"
                     placeholder="Enter your email address"
-                    className="w-full bg-transparent text-sm p-4 rounded-2xl focus:outline-none"
+                    className="w-full h-13 bg-transparent text-sm p-4 rounded-2xl focus:outline-none"
                     required
                   />
                 </GlassInputWrapper>
               </div>
 
-              <div className="animate-element animate-delay-500 grid grid-cols-2 gap-4">
+              <div className="animate-app-fade-in duration-[0.5s] grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                  <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                    <Lock className="w-4 h-4" />
                     Password <span className="text-red-500">*</span>
                   </label>
                   <GlassInputWrapper>
                     <div className="relative">
-                      <input
+                      <FocusTrackingInput
+                        fieldName="add-password"
                         name="password"
                         type={showPassword ? "text" : "password"}
                         placeholder="Create a strong password"
-                        className="w-full bg-transparent text-sm p-4 pr-12 rounded-2xl focus:outline-none"
+                        className="w-full h-13 bg-transparent text-sm p-4 pr-12 rounded-2xl focus:outline-none"
                         required
                       />
                       <button
@@ -116,12 +136,14 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                  <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                    <Shield className="w-4 h-4" />
                     Confirm Password <span className="text-red-500">*</span>
                   </label>
                   <GlassInputWrapper>
                     <div className="relative">
-                      <input
+                      <FocusTrackingInput
+                        fieldName="confirm-password"
                         name="confirmPassword"
                         type={showConfirmPassword ? "text" : "password"}
                         placeholder="Confirm your password"
@@ -146,49 +168,54 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({
                 </div>
               </div>
 
-              <div className="animate-element animate-delay-600 flex items-center gap-3">
-                <input
-                  type="checkbox"
+              <div className="animate-app-fade-in duration-[0.6s] flex items-center gap-3">
+                <Checkbox
                   name="agreeToTerms"
                   className="custom-checkbox"
                   required
                 />
-                <span className="text-sm text-foreground/90">
-                  I agree to the{" "}
-                  <a href="#" className="text-violet-400 hover:underline">
+
+                <span className=" pt-0.5 text-sm text-foreground/90 flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-muted-foreground" />I agree
+                  to the{" "}
+                  <a href="#" className="text-sky-600 hover:underline">
                     Terms of Service
                   </a>{" "}
                   and{" "}
-                  <a href="#" className="text-violet-400 hover:underline">
+                  <a href="#" className="text-sky-600 hover:underline">
                     Privacy Policy
                   </a>
                 </span>
               </div>
 
-              <button
-                type="submit"
-                className="animate-element animate-delay-700 w-full rounded-2xl bg-primary py-4 font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+              <Button
+                intent={theme.theme === "dark" ? "authd" : "authl"}
+                size="auth"
+                className="animate-app-fade-in duration-[0.7s] flex items-center justify-center gap-2"
               >
+                <User className="w-4 h-4" />
                 Create Account
-              </button>
+              </Button>
             </form>
 
-            <div className="animate-element animate-delay-800 relative flex items-center justify-center">
+            <div className="animate-app-fade-in duration-[0.7s] relative flex items-center justify-center">
               <span className="w-full border-t border-border"></span>
               <span className="px-4 text-sm text-muted-foreground bg-background absolute">
                 Or continue with
               </span>
             </div>
 
-            <button
+            <Button
               onClick={continueWithGoogle}
-              className="animate-element animate-delay-900 w-full flex items-center justify-center gap-3 border border-border rounded-2xl py-4 hover:bg-secondary transition-colors"
+              intent={theme.theme === "dark" ? "authl" : "authd"}
+              size="auth"
+              className="animate-app-fade-in duration-[0.8s] flex items-center justify-center gap-2"
             >
               <GoogleIcon />
               Continue with Google
-            </button>
+            </Button>
 
-            <p className="animate-element animate-delay-1000 text-center text-sm text-muted-foreground">
+            <p className="animate-app-fade-in duration-[0.9s] text-center text-sm text-muted-foreground">
               Already have an account?{" "}
               <a
                 href="#"
@@ -196,7 +223,7 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({
                   e.preventDefault();
                   onSignIn?.();
                 }}
-                className="text-violet-400 hover:underline transition-colors"
+                className="text-sky-600 hover:underline transition-colors"
               >
                 Sign In
               </a>
@@ -204,40 +231,6 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({
           </div>
         </div>
       </section>
-
-      {/* Right column: hero image + testimonials */}
-      {heroImageSrc && (
-        <section className="hidden md:block flex-1 relative p-4">
-          <div
-            className="animate-slide-right animate-delay-300 absolute inset-4 rounded-3xl bg-cover bg-center"
-            style={{ backgroundImage: `url(${heroImageSrc})` }}
-          ></div>
-          {testimonials.length > 0 && (
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-4 px-8 w-full justify-center">
-              <TestimonialCard
-                testimonial={testimonials[0]}
-                delay="animate-delay-1500"
-              />
-              {testimonials[1] && (
-                <div className="hidden xl:flex">
-                  <TestimonialCard
-                    testimonial={testimonials[1]}
-                    delay="animate-delay-1600"
-                  />
-                </div>
-              )}
-              {testimonials[2] && (
-                <div className="hidden 2xl:flex">
-                  <TestimonialCard
-                    testimonial={testimonials[2]}
-                    delay="animate-delay-1700"
-                  />
-                </div>
-              )}
-            </div>
-          )}
-        </section>
-      )}
     </div>
   );
 };

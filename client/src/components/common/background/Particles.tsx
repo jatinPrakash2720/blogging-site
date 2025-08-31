@@ -1,16 +1,17 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/store/theme";
 import React, { useEffect, useRef } from "react";
 
 interface ParticlesProps {
   className?: string;
   quantity?: number;
-  staticity?: number;
-  ease?: number;
+  // staticity?: number;
+  // ease?: number;
   size?: number;
   refresh?: boolean;
-  color?: string;
+  // color?: string;
   vx?: number;
   vy?: number;
 }
@@ -35,7 +36,7 @@ const Particles: React.FC<ParticlesProps> = ({
   quantity = 100,
   size = 0.4,
   refresh = false,
-  color = "#ffffff",
+  // color = "#ffffff",
   vx = 0.05, // A small default velocity to make them drift
   vy = 0.05,
 }) => {
@@ -45,6 +46,10 @@ const Particles: React.FC<ParticlesProps> = ({
   const circles = useRef<Circle[]>([]);
   const canvasSize = useRef<{ w: number; h: number }>({ w: 0, h: 0 });
   const dpr = typeof window !== "undefined" ? window.devicePixelRatio : 1;
+
+  const { theme } = useTheme();
+
+  const color = theme === "dark" ? "#ffffff" : "#666666";
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -57,13 +62,17 @@ const Particles: React.FC<ParticlesProps> = ({
     return () => {
       window.removeEventListener("resize", initCanvas);
     };
-  }, [color]);
+  }, [color, refresh]);
 
   useEffect(() => {
     initCanvas();
   }, [refresh]);
 
   const initCanvas = () => {
+    console.log("initCanvas called", {
+      w: canvasSize.current.w,
+      h: canvasSize.current.h,
+    });
     resizeCanvas();
     drawParticles();
   };
@@ -81,8 +90,15 @@ const Particles: React.FC<ParticlesProps> = ({
   const resizeCanvas = () => {
     if (canvasContainerRef.current && canvasRef.current && context.current) {
       circles.current.length = 0;
-      canvasSize.current.w = canvasContainerRef.current.offsetWidth;
-      canvasSize.current.h = canvasContainerRef.current.offsetHeight;
+      // Get dimensions with fallback
+      const containerW =
+        canvasContainerRef.current.offsetWidth || window.innerWidth;
+      const containerH =
+        canvasContainerRef.current.offsetHeight || window.innerHeight;
+
+      canvasSize.current.w = containerW;
+      canvasSize.current.h = containerH;
+
       canvasRef.current.width = canvasSize.current.w * dpr;
       canvasRef.current.height = canvasSize.current.h * dpr;
       canvasRef.current.style.width = `${canvasSize.current.w}px`;
@@ -94,9 +110,9 @@ const Particles: React.FC<ParticlesProps> = ({
   const circleParams = (): Circle => {
     const x = Math.floor(Math.random() * canvasSize.current.w);
     const y = Math.floor(Math.random() * canvasSize.current.h);
-    const pSize = Math.floor(Math.random() * 2) + size;
+    const pSize = Math.random() * 2 + size;
     const alpha = 0;
-    const targetAlpha = parseFloat((Math.random() * 0.6 + 0.1).toFixed(1));
+    const targetAlpha = parseFloat((Math.random() * 0.4 + 0.2).toFixed(1));
     const dx = (Math.random() - 0.5) * 0.1;
     const dy = (Math.random() - 0.5) * 0.1;
     return {
@@ -141,6 +157,7 @@ const Particles: React.FC<ParticlesProps> = ({
   const drawParticles = () => {
     clearContext();
     const particleCount = quantity;
+
     for (let i = 0; i < particleCount; i++) {
       const circle = circleParams();
       drawCircle(circle);
@@ -202,11 +219,12 @@ const Particles: React.FC<ParticlesProps> = ({
 
   return (
     <div
-      className={cn("pointer-events-none", className)}
+      className={cn("pointer-events-none w-full h-full", className)}
       ref={canvasContainerRef}
       aria-hidden="true"
+      style={{ minHeight: "100vh", minWidth: "100vw" }}
     >
-      <canvas ref={canvasRef} className="size-full" />
+      <canvas ref={canvasRef} className="w-full h-full" />
     </div>
   );
 };

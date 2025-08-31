@@ -1,21 +1,24 @@
+
+
+
 "use client";
 
 import type React from "react";
 import { cn } from "@/lib/utils";
-import { LayoutToggle, type LayoutType } from "../subComps/layout-toggle";
+import { LayoutToggle, type LayoutType } from "./layout-toggle";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+// import type { MenuBarItem } from "@/types";
 
 interface MenuBarItem {
   slug: string;
   label: string;
   icon: React.FC<React.SVGProps<SVGSVGElement>>;
 }
-
 interface MenuBarProps {
   items: MenuBarItem[];
   activeFilter?: string;

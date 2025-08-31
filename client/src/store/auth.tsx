@@ -101,7 +101,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         () => userService.registerUser(userData),
         setLoading,
         () => {
-          navigate("/login");
+          navigate("/auth/login");
         },
         setError
       );
@@ -115,11 +115,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setLoading,
       () => {
         clearAuthState();
-        navigate("/login");
+        navigate("/auth/login");
       },
       (error) => {
         clearAuthState();
-        navigate("/login");
+        navigate("/auth/login");
         setError(error);
       }
     );
@@ -137,7 +137,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       (error) => {
         setError(error);
         clearAuthState();
-        navigate("/login");
+        navigate("/auth/login");
       }
     );
   }, [navigate, clearAuthState, fetchCurrentUser]);
@@ -193,7 +193,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 
   const forgotPassword = useCallback(async (payload: ForgotPasswordPayload) => {
-    
     let success = false;
     await requestHandler(
       () => userService.forgotPassword(payload),
@@ -206,20 +205,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return success;
   }, []);
 
-  const restorePassword = useCallback(async (token: string, payload: ResetPasswordPayload) => {
-    let success = false;
-    await requestHandler(
-      () => userService.restorePassword(token, payload),
-      setLoading,
-      () => {
-        success = true;
-        navigate("/login");
-      },
-      setError
-    );
-    return success;
-  }, [navigate]);
-
+  const restorePassword = useCallback(
+    async (token: string, payload: ResetPasswordPayload) => {
+      let success = false;
+      await requestHandler(
+        () => userService.restorePassword(token, payload),
+        setLoading,
+        () => {
+          success = true;
+          navigate("/auth/login");
+        },
+        setError
+      );
+      return success;
+    },
+    [navigate]
+  );
 
   const clearAuthError = useCallback(() => {
     setError(null);

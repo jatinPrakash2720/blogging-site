@@ -5,8 +5,12 @@ import { useState } from "react";
 import { Lock, CheckCircle, AlertCircle, Eye, EyeOff } from "lucide-react";
 import type {RestorePasswordProps } from "@/types/components/features/auth";
 import { GlassInputWrapper } from "@/components/common/subComps/GlassInputWrapper";
+import Input from "@/components/common/wrappers/Input";
+import Button from "@/components/common/wrappers/Button";
+import { useTheme } from "@/store/theme";
 import { TestimonialCard } from "@/components/common/subComps/TestimonialCard";
 import "./auth.css";
+import FocusTrackingInput from "@/components/common/wrappers/FocusTrackingInput";
 
 export const RestorePassword: React.FC<RestorePasswordProps> = ({
   title = (
@@ -20,6 +24,8 @@ export const RestorePassword: React.FC<RestorePasswordProps> = ({
   onRestorePassword,
   onGoToSignIn,
 }) => {
+
+  const theme = useTheme();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -84,18 +90,18 @@ export const RestorePassword: React.FC<RestorePasswordProps> = ({
   if (submitStatus === "success") {
     return (
       <div className="h-[100dvh] flex flex-col md:flex-row font-sans w-[100dvw]">
-        <section className="flex-1 flex items-center justify-center p-8">
+        <section className="flex-1 flex items-center justify-center p-4">
           <div className="w-full max-w-md text-center">
             <div className="flex flex-col gap-6">
-              <div className="animate-element animate-delay-100 flex items-center justify-center w-16 h-16 mx-auto bg-green-100 dark:bg-green-900/30 rounded-full">
+              <div className="opacity-0 animate-fade-slide-in [animation-delay:0.1s] flex items-center justify-center w-16 h-16 mx-auto bg-green-100 dark:bg-green-900/30 rounded-full">
                 <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
               </div>
 
-              <h1 className="animate-element animate-delay-200 text-4xl md:text-5xl font-semibold leading-tight">
+              <h1 className="opacity-0 animate-fade-slide-in [animation-delay:0.2s] text-4xl md:text-5xl font-semibold leading-tight">
                 Password Updated!
               </h1>
 
-              <div className="animate-element animate-delay-300 space-y-2">
+              <div className="opacity-0 animate-fade-slide-in [animation-delay:0.3s] space-y-2">
                 <p className="text-muted-foreground">
                   Your password has been successfully updated.
                 </p>
@@ -106,7 +112,7 @@ export const RestorePassword: React.FC<RestorePasswordProps> = ({
 
               <button
                 onClick={onGoToSignIn}
-                className="animate-element animate-delay-400 w-full rounded-2xl bg-primary py-4 font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                className="opacity-0 animate-fade-slide-in [animation-delay:0.4s] w-full rounded-2xl bg-primary py-4 font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 Continue to Sign In
               </button>
@@ -114,7 +120,7 @@ export const RestorePassword: React.FC<RestorePasswordProps> = ({
           </div>
         </section>
 
-        {heroImageSrc && (
+        {/* {heroImageSrc && (
           <section className="hidden md:block flex-1 relative p-4">
             <div
               className="animate-slide-right animate-delay-300 absolute inset-4 rounded-3xl bg-cover bg-center"
@@ -145,17 +151,17 @@ export const RestorePassword: React.FC<RestorePasswordProps> = ({
               </div>
             )}
           </section>
-        )}
+        )} */}
       </div>
     );
   }
 
   return (
     <div className="h-[100dvh] flex flex-col md:flex-row font-sans w-[100dvw]">
-      <section className="flex-1 flex items-center justify-center p-8">
+      <section className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <div className="flex flex-col gap-6">
-            <div className="animate-element animate-delay-200 text-center">
+            <div className="opacity-0 animate-fade-slide-in [animation-delay:0.1s] text-center">
               <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-blue-100 dark:bg-blue-900/30 rounded-full">
                 <Lock className="w-8 h-8 text-blue-600 dark:text-blue-400" />
               </div>
@@ -166,13 +172,14 @@ export const RestorePassword: React.FC<RestorePasswordProps> = ({
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="animate-element animate-delay-300">
+              <div className="opacity-0 animate-fade-slide-in [animation-delay:0.2s]">
                 <label className="text-sm font-medium text-muted-foreground block mb-2">
                   New Password
                 </label>
                 <GlassInputWrapper>
                   <div className="relative">
-                    <input
+                    <FocusTrackingInput
+                      fieldName="set-new-password"
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -181,6 +188,15 @@ export const RestorePassword: React.FC<RestorePasswordProps> = ({
                       required
                       disabled={isSubmitting}
                     />
+                    {/* <Input
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Enter your new password"
+                      className="w-full bg-transparent text-sm p-4 pr-12 rounded-2xl focus:outline-none"
+                      required
+                      disabled={isSubmitting}
+                    /> */}
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
@@ -196,13 +212,14 @@ export const RestorePassword: React.FC<RestorePasswordProps> = ({
                 </GlassInputWrapper>
               </div>
 
-              <div className="animate-element animate-delay-400">
+              <div className="opacity-0 animate-fade-slide-in [animation-delay:0.3s]">
                 <label className="text-sm font-medium text-muted-foreground block mb-2">
                   Confirm New Password
                 </label>
                 <GlassInputWrapper>
                   <div className="relative">
-                    <input
+                    <FocusTrackingInput
+                      fieldName="set-confirm-password"
                       type={showConfirmPassword ? "text" : "password"}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
@@ -211,6 +228,15 @@ export const RestorePassword: React.FC<RestorePasswordProps> = ({
                       required
                       disabled={isSubmitting}
                     />
+                    {/* <Input
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Confirm your new password"
+                      className="w-full bg-transparent text-sm p-4 pr-12 rounded-2xl focus:outline-none"
+                      required
+                      disabled={isSubmitting}
+                    /> */}
                     <button
                       type="button"
                       onClick={() =>
@@ -246,7 +272,9 @@ export const RestorePassword: React.FC<RestorePasswordProps> = ({
                 </ul>
               </div>
 
-              <button
+              <Button
+                intent={theme.theme === "dark" ? "authd" : "authl"}
+                size="auth"
                 type="submit"
                 disabled={
                   isSubmitting || !password.trim() || !confirmPassword.trim()
@@ -261,13 +289,13 @@ export const RestorePassword: React.FC<RestorePasswordProps> = ({
                 ) : (
                   "Update Password"
                 )}
-              </button>
+              </Button>
             </form>
           </div>
         </div>
       </section>
 
-      {heroImageSrc && (
+      {/* {heroImageSrc && (
         <section className="hidden md:block flex-1 relative p-4">
           <div
             className="animate-slide-right animate-delay-300 absolute inset-4 rounded-3xl bg-cover bg-center"
@@ -298,7 +326,7 @@ export const RestorePassword: React.FC<RestorePasswordProps> = ({
             </div>
           )}
         </section>
-      )}
+      )} */}
     </div>
   );
 };

@@ -7,6 +7,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { useTheme } from "@/store/theme";
 
 interface FlickeringGridProps {
   squareSize?: number;
@@ -34,22 +35,27 @@ const FlickeringGrid: React.FC<FlickeringGridProps> = ({
   const [isInView, setIsInView] = useState(false);
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
 
+  const { theme } = useTheme();
+
   const memoizedColor = useMemo(() => {
-    const toRGBA = (color: string) => {
-      if (typeof window === "undefined") {
-        return `rgba(0, 0, 0,`;
-      }
-      const canvas = document.createElement("canvas");
-      canvas.width = canvas.height = 1;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return "rgba(255, 0, 0,";
-      ctx.fillStyle = color;
-      ctx.fillRect(0, 0, 1, 1);
-      const [r, g, b] = Array.from(ctx.getImageData(0, 0, 1, 1).data);
-      return `rgba(${r}, ${g}, ${b},`;
-    };
-    return toRGBA(color);
-  }, [color]);
+    const color = theme === 'dark' ? 'rgb(255,255,255)' : 'rgb(0,0,0)';
+    const [r, g, b] = color.match(/\d+/g)!.map(Number);
+    return `rgba(${r},${g},${b})`;
+    // const toRGBA = (color: string) => {
+    //   if (typeof window === "undefined") {
+    //     return `rgba(0, 0, 0,`;
+    //   }
+    //   const canvas = document.createElement("canvas");
+    //   canvas.width = canvas.height = 1;
+    //   const ctx = canvas.getContext("2d");
+    //   if (!ctx) return "rgba(255, 0, 0,";
+    //   ctx.fillStyle = color;
+    //   ctx.fillRect(0, 0, 1, 1);
+    //   const [r, g, b] = Array.from(ctx.getImageData(0, 0, 1, 1).data);
+    //   return `rgba(${r}, ${g}, ${b},`;
+    // };
+    // return toRGBA(color);
+  }, [theme]);
 
   const setupCanvas = useCallback(
     (canvas: HTMLCanvasElement, width: number, height: number) => {
@@ -93,8 +99,8 @@ const FlickeringGrid: React.FC<FlickeringGridProps> = ({
       dpr: number
     ) => {
       ctx.clearRect(0, 0, width, height);
-      ctx.fillStyle = "transparent";
-      ctx.fillRect(0, 0, width, height);
+      // ctx.fillStyle = "transparent";
+      // ctx.fillRect(0, 0, width, height);
 
       for (let i = 0; i < cols; i++) {
         for (let j = 0; j < rows; j++) {

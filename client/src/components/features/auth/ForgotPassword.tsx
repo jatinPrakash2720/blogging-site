@@ -5,8 +5,11 @@ import { useState } from "react";
 import { ArrowLeft, Mail, User, CheckCircle, AlertCircle } from "lucide-react";
 import type { ForgotPasswordProps } from "@/types/components/features/auth";
 import { GlassInputWrapper } from "@/components/common/subComps/GlassInputWrapper";
+import Input from "@/components/common/wrappers/Input";
+import { useTheme } from "@/store/theme";
 import { TestimonialCard } from "@/components/common/subComps/TestimonialCard";
-import "./auth.css";
+import Button from "@/components/common/wrappers/Button";
+import FocusTrackingInput from "@/components/common/wrappers/FocusTrackingInput";
 
 export const ForgotPassword: React.FC<ForgotPasswordProps> = ({
   title = (
@@ -20,6 +23,8 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({
   onResetPassword,
   onGoBack,
 }) => {
+
+  const theme = useTheme();
   const [searchMethod, setSearchMethod] = useState<"email" | "username">(
     "email"
   );
@@ -63,15 +68,15 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({
         <section className="flex-1 flex items-center justify-center p-8">
           <div className="w-full max-w-md text-center">
             <div className="flex flex-col gap-6">
-              <div className="animate-element animate-delay-100 flex items-center justify-center w-16 h-16 mx-auto bg-green-100 dark:bg-green-900/30 rounded-full">
+              <div className="animate-app-fade-in duration-[0.1s] flex items-center justify-center w-16 h-16 mx-auto bg-green-100 dark:bg-green-900/30 rounded-full">
                 <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
               </div>
 
-              <h1 className="animate-element animate-delay-200 text-4xl md:text-5xl font-semibold leading-tight">
+              <h1 className="animate-app-fade-in duration-[0.2s] text-4xl md:text-5xl font-semibold leading-tight">
                 Check Your Email
               </h1>
 
-              <div className="animate-element animate-delay-300 space-y-2">
+              <div className="animate-app-fade-in duration-[0.2s] space-y-2">
                 <p className="text-muted-foreground">
                   We've sent a password reset link to your email address
                 </p>
@@ -81,7 +86,7 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({
                 </p>
               </div>
 
-              <div className="animate-element animate-delay-400 space-y-4">
+              <div className="animate-app-fade-in duration-[0.2s] space-y-4">
                 <button
                   onClick={onGoBack}
                   className="w-full rounded-2xl bg-primary py-4 font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
@@ -107,7 +112,7 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({
         </section>
 
         {/* Right column: hero image + testimonials */}
-        {heroImageSrc && (
+        {/* {heroImageSrc && (
           <section className="hidden md:block flex-1 relative p-4">
             <div
               className="animate-slide-right animate-delay-300 absolute inset-4 rounded-3xl bg-cover bg-center"
@@ -138,13 +143,13 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({
               </div>
             )}
           </section>
-        )}
+        )} */}
       </div>
     );
   }
 
   return (
-    <div className="h-[100dvh] flex flex-col md:flex-row font-sans w-[100dvw]">
+    <div className="h-[100dvh] flex flex-col md:flex-row font-sans w-[100dvw] overflow-hidden">
       {/* Left column: Reset password form */}
       <section className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-md">
@@ -152,14 +157,14 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({
             {onGoBack && (
               <button
                 onClick={onGoBack}
-                className="animate-element animate-delay-100 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors w-fit"
+                className="animate-app-fade-in duration-[0.2s] flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors w-fit"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to Sign In
               </button>
             )}
 
-            <div className="animate-element animate-delay-200 text-center">
+            <div className="animate-app-fade-in duration-[0.2s] text-center">
               <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-blue-100 dark:bg-blue-900/30 rounded-full">
                 <Mail className="w-8 h-8 text-blue-600 dark:text-blue-400" />
               </div>
@@ -170,11 +175,11 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="animate-element animate-delay-300">
+              <div className="animate-app-fade-in duration-[0.2s]">
                 <label className="text-sm font-medium text-muted-foreground block mb-3">
                   Find your account by:
                 </label>
-                <div className="flex gap-2 p-1 bg-muted/30 rounded-2xl">
+                <div className="flex gap-2 p-1 bg-muted/30  rounded-2xl">
                   <button
                     type="button"
                     onClick={() => {
@@ -183,7 +188,7 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({
                     }}
                     className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-medium transition-all ${
                       searchMethod === "email"
-                        ? "bg-background text-foreground shadow-sm"
+                        ? "dark:bg-foreground/10 bg-background text-foreground shadow-sm"
                         : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
@@ -198,7 +203,7 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({
                     }}
                     className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-medium transition-all ${
                       searchMethod === "username"
-                        ? "bg-background text-foreground shadow-sm"
+                        ? "dark:bg-foreground/10 bg-background text-foreground shadow-sm"
                         : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
@@ -208,12 +213,13 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({
                 </div>
               </div>
 
-              <div className="animate-element animate-delay-400">
+              <div className="animate-app-fade-in duration-[0.2s]">
                 <label className="text-sm font-medium text-muted-foreground block mb-2">
                   {searchMethod === "email" ? "Email Address" : "Username"}
                 </label>
                 <GlassInputWrapper>
-                  <input
+                  <FocusTrackingInput
+                    fieldName="find-account"
                     type={searchMethod === "email" ? "email" : "text"}
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
@@ -230,7 +236,7 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({
               </div>
 
               {submitStatus === "error" && (
-                <div className="animate-element flex items-center gap-2 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl">
+                <div className="animate-app-fade-in duration-[0.2s] flex items-center gap-2 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl">
                   <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" />
                   <p className="text-sm text-red-800 dark:text-red-200">
                     {errorMessage}
@@ -238,10 +244,12 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({
                 </div>
               )}
 
-              <button
-                type="submit"
+              <Button
+                // type="submit"
+                intent={theme.theme === "dark" ? "authl" : "authd"}
+                size="auth"
                 disabled={isSubmitting || !identifier.trim()}
-                className="animate-element animate-delay-500 w-full rounded-2xl bg-primary py-4 font-medium text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="animate-app-fade-in duration-[0.2s] w-full rounded-2xl bg-primary py-4 font-medium text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <div className="flex items-center justify-center gap-2">
@@ -251,15 +259,15 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({
                 ) : (
                   "Send Reset Link"
                 )}
-              </button>
+              </Button>
             </form>
 
-            <div className="animate-element animate-delay-700 text-center text-xs text-muted-foreground">
+            <div className="animate-app-fade-in duration-[0.2s] text-center text-xs text-muted-foreground">
               <p>
                 Remember your password?{" "}
                 <button
                   onClick={onGoBack}
-                  className="text-violet-400 hover:text-violet-300 transition-colors"
+                  className="text-sky-600 hover:text-sky-500 transition-colors"
                 >
                   Sign In
                 </button>
@@ -270,7 +278,7 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({
       </section>
 
       {/* Right column: hero image + testimonials */}
-      {heroImageSrc && (
+      {/* {heroImageSrc && (
         <section className="hidden md:block flex-1 relative p-4">
           <div
             className="animate-slide-right animate-delay-300 absolute inset-4 rounded-3xl bg-cover bg-center"
@@ -301,7 +309,7 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({
             </div>
           )}
         </section>
-      )}
+      )} */}
     </div>
   );
 };

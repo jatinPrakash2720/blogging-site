@@ -1,7 +1,8 @@
 import type { Testimonial } from "@/types/components/features/auth";
 
-export const TestimonialCard = ({
+// import type { Testimonial } from "@/types"; // Assuming a central Testimonial type
 
+export const TestimonialCard = ({
   testimonial,
   delay,
 }: {
@@ -21,5 +22,6 @@ export const TestimonialCard = ({
       <p className="text-muted-foreground">{testimonial.handle}</p>
       <p className="mt-1 text-foreground/80">{testimonial.text}</p>
     </div>
-    </div>
+  </div>
 );
+

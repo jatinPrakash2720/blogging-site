@@ -1,15 +1,18 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Camera, User, Plus, X } from "lucide-react";
 import type { ProfileSetupProps } from "@/types/components/features/auth";
 import "./auth.css";
+import FocusTrackingInput from "@/components/common/wrappers/FocusTrackingInput";
+import { useAuthProgress } from "@/store/theme";
 
 export const ProfileSetup: React.FC<ProfileSetupProps> = ({
   onComplete,
   onSkip,
 }) => {
+  const { setCurrentStep } = useAuthProgress();
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string>("");
@@ -17,9 +20,17 @@ export const ProfileSetup: React.FC<ProfileSetupProps> = ({
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
 
+  // Set initial step when component mounts
+  useEffect(() => {
+    console.log("[ProfileSetup] Setting initial step to: cover");
+    setCurrentStep("cover");
+  }, [setCurrentStep]);
+
   const handleAvatarUpload = (file: File) => {
     setUploadingAvatar(true);
     setAvatarFile(file);
+    console.log("[ProfileSetup] Setting step to: avatar");
+    setCurrentStep("avatar");
     const reader = new FileReader();
     reader.onload = (e) => {
       setAvatarPreview(e.target?.result as string);
@@ -31,6 +42,8 @@ export const ProfileSetup: React.FC<ProfileSetupProps> = ({
   const handleCoverUpload = (file: File) => {
     setUploadingCover(true);
     setCoverFile(file);
+    console.log("[ProfileSetup] Setting step to: cover");
+    setCurrentStep("cover");
     const reader = new FileReader();
     reader.onload = (e) => {
       setCoverPreview(e.target?.result as string);
@@ -63,7 +76,7 @@ export const ProfileSetup: React.FC<ProfileSetupProps> = ({
       <div className="w-full max-w-lg">
         <div className="flex flex-col gap-8">
           {/* Header */}
-          <div className="text-center animate-element animate-delay-100">
+          <div className="animate-app-zoom-in duration-[0.4s] text-center animate-element animate-delay-100">
             <h1 className="text-4xl md:text-5xl font-semibold leading-tight mb-2">
               <span className="font-light text-foreground tracking-tighter">
                 Setup Your Profile
@@ -74,14 +87,15 @@ export const ProfileSetup: React.FC<ProfileSetupProps> = ({
             </p>
           </div>
 
-          <div className="animate-element animate-delay-200">
+          <div className="animate-app-zoom-in duration-[0.4s]">
             <div className="relative rounded-3xl overflow-hidden bg-card border border-border shadow-lg backdrop-blur-sm">
               {/* Cover Image Area - Clickable */}
               <div
                 className="relative h-32 group cursor-pointer"
                 onClick={() => document.getElementById("cover-input")?.click()}
               >
-                <input
+                <FocusTrackingInput
+                  fieldName="cover"
                   id="cover-input"
                   type="file"
                   accept="image/*"
@@ -91,6 +105,16 @@ export const ProfileSetup: React.FC<ProfileSetupProps> = ({
                   }}
                   className="hidden"
                 />
+                {/* <input
+                  id="cover-input"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleCoverUpload(file);
+                  }}
+                  className="hidden"
+                /> */}
 
                 {coverPreview ? (
                   <>
@@ -107,10 +131,12 @@ export const ProfileSetup: React.FC<ProfileSetupProps> = ({
                     </button>
                   </>
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-r from-violet-100 to-blue-100 dark:from-violet-900/30 dark:to-blue-900/30 flex items-center justify-center">
-                    <div className="text-center text-muted-foreground group-hover:text-foreground transition-colors">
+                  <div className="w-full h-full bg-gradient-to-r from-blue-100 to-blue-300 dark:from-blue-900/30 group-hover:bg-primary dark:to-blue-300/30 flex items-center justify-center">
+                    <div className="text-center text-muted-foreground group-hover:opacity-0 group-hover:text-foreground  transition-colors">
                       <Camera className="w-8 h-8 mx-auto mb-1" />
-                      <p className="text-sm font-medium">Add Cover</p>
+                      <p className="text-sm font-medium group-hover:opacity-0">
+                        Add Cover
+                      </p>
                     </div>
                   </div>
                 )}
@@ -133,7 +159,7 @@ export const ProfileSetup: React.FC<ProfileSetupProps> = ({
               </div>
 
               {/* Profile Content */}
-              <div className="relative px-6 pb-6">
+              <div className="relative px-6 pb-6 ">
                 {/* Avatar - Clickable */}
                 <div className="absolute -top-12 left-6">
                   <div
@@ -142,7 +168,8 @@ export const ProfileSetup: React.FC<ProfileSetupProps> = ({
                       document.getElementById("avatar-input")?.click()
                     }
                   >
-                    <input
+                    <FocusTrackingInput
+                      fieldName="avatar"
                       id="avatar-input"
                       type="file"
                       accept="image/*"
@@ -152,6 +179,16 @@ export const ProfileSetup: React.FC<ProfileSetupProps> = ({
                       }}
                       className="hidden"
                     />
+                    {/* <input
+                      id="avatar-input"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleAvatarUpload(file);
+                      }}
+                      className="hidden"
+                    /> */}
 
                     {avatarPreview ? (
                       <>
@@ -168,8 +205,8 @@ export const ProfileSetup: React.FC<ProfileSetupProps> = ({
                         </button>
                       </>
                     ) : (
-                      <div className="w-24 h-24 rounded-full border-4 border-background bg-muted flex items-center justify-center shadow-lg group-hover:bg-muted/80 transition-colors">
-                        <User className="w-8 h-8 text-muted-foreground group-hover:text-foreground transition-colors" />
+                      <div className="w-24 h-24 rounded-full border-4 border-background  bg-muted flex items-center justify-center shadow-lg group-hover:bg-muted/80 transition-colors">
+                        <User className="w-8 h-8 text-muted-foreground group-hover:opacity-0 group-hover:text-foreground transition-colors" />
                       </div>
                     )}
 
@@ -189,19 +226,19 @@ export const ProfileSetup: React.FC<ProfileSetupProps> = ({
                 </div>
 
                 {/* Profile Info */}
-                <div className="pt-16">
-                  <h3 className="text-xl font-semibold text-foreground">
+                <div className="pt-16 ">
+                  <h3 className="text-xl font-semibold text-foreground animate-app-zoom-in duration-[0.6s] ">
                     Sophia Carter
                   </h3>
-                  <p className="text-muted-foreground text-sm mb-2">
+                  <p className="text-muted-foreground text-sm mb-2 animate-app-zoom-in duration-[0.6s] ">
                     @sophiacarter
                   </p>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
+                  <p className="text-muted-foreground text-sm leading-relaxedanimate-app-zoom-in duration-[0.6s] ">
                     Software Engineer | Foodie | Travel Enthusiast
                   </p>
 
                   {/* Follow Button (Mock) */}
-                  <button className="mt-4 w-full py-2 px-4 bg-foreground text-background rounded-xl font-medium text-sm hover:bg-foreground/90 transition-colors">
+                  <button className="animate-app-fade-in duration-[0.8s]  mt-4 w-full py-2 px-4 bg-foreground text-background rounded-xl font-medium text-sm hover:bg-foreground/90 transition-colors">
                     Follow
                   </button>
                 </div>

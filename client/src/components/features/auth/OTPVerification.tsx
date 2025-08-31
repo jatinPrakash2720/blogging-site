@@ -6,6 +6,8 @@ import { ArrowLeft, RefreshCw } from "lucide-react";
 import type { OTPVerificationPageProps } from "@/types/components/features/auth";
 import { TestimonialCard } from "@/components/common/subComps/TestimonialCard";
 import { OTPInput } from "@/components/common/subComps/OTPInputs";
+import Button from "@/components/common/wrappers/Button";
+import { useTheme } from "@/store/theme";
 import "./auth.css";
 
 export const OTPVerificationPage: React.FC<OTPVerificationPageProps> = ({
@@ -26,6 +28,8 @@ export const OTPVerificationPage: React.FC<OTPVerificationPageProps> = ({
   const [otp, setOtp] = useState("");
   const [isResending, setIsResending] = useState(false);
   const [countdown, setCountdown] = useState(0);
+
+  const theme = useTheme();
 
   useEffect(() => {
     if (countdown > 0) {
@@ -58,33 +62,35 @@ export const OTPVerificationPage: React.FC<OTPVerificationPageProps> = ({
   };
 
   return (
-    <div className="h-[100dvh] flex flex-col md:flex-row font-sans w-[100dvw]">
+    <div className="h-[100dvh] flex flex-col md:flex-row font-sans w-[100dvw] border-black">
       {/* Left column: OTP verification form */}
       <section className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-md">
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col items-start gap-6">
             {onGoBack && (
               <button
                 onClick={onGoBack}
-                className="animate-element animate-delay-100 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors w-fit"
+                className="opacity-0 animate-fade-slide-in [animation-delay:0.1s] flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors w-fit"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back
               </button>
             )}
 
-            <h1 className="animate-element animate-delay-200 text-4xl md:text-5xl font-semibold leading-tight">
+            <h1 className="opacity-0 animate-fade-slide-in [animation-delay:0.2s] text-4xl md:text-5xl font-semibold leading-tight text-center w-full">
               {title}
             </h1>
 
-            <div className="animate-element animate-delay-300">
-              <p className="text-muted-foreground">{description}</p>
-              <p className="text-sm text-foreground/80 mt-1">
+            <div className="opacity-0 animate-fade-slide-in [animation-delay:0.3s] w-full flex flex-col items-center">
+              <p className="text-muted-foreground text-center ">
+                {description}
+              </p>
+              <p className="text-sm text-foreground/80 mt-1 text-center">
                 Sent to <span className="font-medium">{email}</span>
               </p>
             </div>
 
-            <div className="animate-element animate-delay-400 space-y-6">
+            <div className="opacity-0 animate-fade-slide-in [animation-delay:0.4s] w-full space-y-6">
               <div>
                 <label className="text-sm font-medium text-muted-foreground block mb-4 text-center">
                   Enter {codeLength}-digit verification code
@@ -92,23 +98,25 @@ export const OTPVerificationPage: React.FC<OTPVerificationPageProps> = ({
                 <OTPInput length={codeLength} onComplete={handleOTPComplete} />
               </div>
 
-              <button
+              <Button
+                intent={theme.theme === "dark" ? "authd" : "authl"}
+                size="auth"
                 onClick={handleVerify}
                 disabled={otp.length !== codeLength}
-                className="animate-element animate-delay-500 w-full rounded-2xl bg-primary py-4 font-medium text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="animate-element animate-delay-500"
               >
                 Verify Code
-              </button>
+              </Button>
             </div>
 
-            <div className="animate-element animate-delay-600 text-center">
+            <div className="opacity-0 animate-fade-slide-in [animation-delay:0.5s] text-center w-full">
               <p className="text-sm text-muted-foreground mb-3">
                 Didn't receive the code?
               </p>
               <button
                 onClick={handleResend}
                 disabled={countdown > 0 || isResending}
-                className="flex items-center gap-2 text-violet-400 hover:text-violet-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mx-auto"
+                className="flex items-center gap-2 text-sky-600 hover:text-sky-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mx-auto"
               >
                 <RefreshCw
                   className={`w-4 h-4 ${isResending ? "animate-spin" : ""}`}
@@ -117,7 +125,7 @@ export const OTPVerificationPage: React.FC<OTPVerificationPageProps> = ({
               </button>
             </div>
 
-            <div className="animate-element animate-delay-700 text-center text-xs text-muted-foreground">
+            <div className=" w-full opacity-0 animate-fade-slide-in [animation-delay:0.6s] text-center text-xs text-muted-foreground">
               <p>Check your spam folder if you don't see the email</p>
             </div>
           </div>
@@ -125,7 +133,7 @@ export const OTPVerificationPage: React.FC<OTPVerificationPageProps> = ({
       </section>
 
       {/* Right column: hero image + testimonials */}
-      {heroImageSrc && (
+      {/* {heroImageSrc && (
         <section className="hidden md:block flex-1 relative p-4">
           <div
             className="animate-slide-right animate-delay-300 absolute inset-4 rounded-3xl bg-cover bg-center"
@@ -156,7 +164,7 @@ export const OTPVerificationPage: React.FC<OTPVerificationPageProps> = ({
             </div>
           )}
         </section>
-      )}
+      )} */}
     </div>
   );
 };

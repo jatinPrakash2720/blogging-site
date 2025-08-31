@@ -16,6 +16,7 @@ import { useInView } from "@/hooks/UseInView";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { LayoutType } from "../components/common/subComps/layout-toggle";
+import { useTheme } from "@/store/theme";
 
 interface MenuBarItem {
   slug: string;
@@ -504,7 +505,7 @@ const forYouBlogs = [
 ];
 
 const HomePage: React.FC = () => {
-  const [theme, setTheme] = useState("light");
+  // const [theme, setTheme] = useState("light");
   const [activeFilter, setActiveFilter] = useState<string>("for-you");
   const [blogsToDisplay, setBlogsToDisplay] = useState(forYouBlogs);
   const [layout, setLayout] = useState<LayoutType>("square");
@@ -515,10 +516,12 @@ const HomePage: React.FC = () => {
   const { loading } = useBlogs();
   const { currentUser } = useAuth();
 
-  const handleThemeChange = (newTheme: string) => {
-    setTheme(newTheme);
-  };
+  // const handleThemeChange = (newTheme: string) => {
+  //   setTheme(newTheme);
+  // };
 
+  const usetheme = useTheme();
+  const theme = usetheme.theme;
   const menuItems: MenuBarItem[] = [
     { slug: "for-you", label: "For You", icon: Home },
     { slug: "explore", label: "Explore", icon: Compass },
@@ -543,17 +546,9 @@ const HomePage: React.FC = () => {
     }
   }, [activeFilter]);
 
-  useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.remove("light", "dark");
-    root.classList.add(theme);
-  }, [theme]);
-
   return (
     <div className="min-h-screen flex flex-col">
       <Header
-        theme={theme}
-        themeProp={handleThemeChange}
         onHeightChange={setHeaderHeight}
       />
       <div
@@ -563,7 +558,6 @@ const HomePage: React.FC = () => {
         <ParticleBackground
           className="fixed inset-0 -z-10"
           quantity={250}
-          color={theme === "light" ? "#00000" : "#ffffff"}
         />
         <main className="container max-w-[95%] mx-auto px-4">
           <div className="my-6">

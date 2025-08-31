@@ -1,5 +1,5 @@
 import type React from "react";
-import BlogCard from "./BlogCard";
+import BlogCard from "./BlogCard1";
 import type { LayoutType } from "../../common/subComps/layout-toggle";
 
 interface BlogListProps {
@@ -23,7 +23,9 @@ const BlogList: React.FC<BlogListProps> = ({ blogs, layout = "square" }) => {
       : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center";
 
   return (
-    <div className={`${gridClasses}`}>
+    <div
+      className={`${gridClasses}`}
+    >
       {blogs.map((blog) => (
         <BlogCard layout={layout} key={blog._id} blog={blog} />
       ))}

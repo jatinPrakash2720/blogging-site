@@ -10,7 +10,7 @@
 
 // export const authLimiter = rateLimit({
 //   windowMs: 10 * 60 * 1000, //10 minutes
-//   max: 1000,
+//   max: 100,
 //   message: "Too many authentication attempts, please try agan after 10 minutes",
 //   standardHeaders: true,
 //   legacyHeaders: false,

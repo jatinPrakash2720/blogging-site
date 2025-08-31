@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 // Import all your common components
 import Button from "../components/common/wrappers/Button";
+import ThemeToggle from "../components/common/wrappers/ThemeToggle";
+import { useTheme } from "../store/theme";
 import Avatar from "../components/common/wrappers/Avatar";
 import Input from "../components/common/wrappers/Input";
 import Textarea from "../components/common/wrappers/Textarea";
@@ -242,18 +244,8 @@ const componentPages = [
 ];
 
 const ComponentPlayground = () => {
-  const [theme, setTheme] = useState("light");
   const [currentPage, setCurrentPage] = useState(0);
-
-  useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.remove("light", "dark");
-    root.classList.add(theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(theme === "light" ? "dark" : "light");
-  };
+  const { theme } = useTheme();
 
   // Mock data for components that need it
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -266,12 +258,12 @@ const ComponentPlayground = () => {
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors">
+        <div className="fixed top-6 right-6 z-50">
+          <ThemeToggle />
+        </div>
         <div className="container mx-auto p-8">
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-3xl font-bold">Component Playground</h1>
-            <Button onClick={toggleTheme} intent="secondary">
-              Toggle {theme === "light" ? "Dark" : "Light"} Mode
-            </Button>
           </div>
 
           {/* Pagination Controls */}

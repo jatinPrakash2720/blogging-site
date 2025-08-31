@@ -30,7 +30,7 @@ interface BlogCardProps {
 const BlogCard: React.FC<BlogCardProps> = ({ blog, layout = "square" }) => {
   if (layout === "landscape") {
     return (
-      <Card className="backdrop-blur-xl p-0  bg-white/20 dark:bg-[#171717] border border-[#E0E1E1/30] dark:border-[#E0E1E1/40] w-full rounded-2xl shadow-lg shadow-black/5 dark:shadow-black/20 transition-all duration-300 hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-black/30 hover:bg-white/30 hover:border-[#E0E1E1/40] overflow-hidden relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-transparent dark:before:from-white/5 before:pointer-events-none before:rounded-2xl pb-0">
+      <Card className="backdrop-blur-sm p-0  bg-[#ffffff] dark:bg-[#000000] border border-[#E0E1E1/30] dark:border-[#E0E1E1/40] w-full rounded-2xl shadow-lg shadow-black/5 dark:shadow-black/20 transition-all duration-300 hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-black/30 hover:bg-[#ffffff]/30 hover:border-[#E0E1E1/40] overflow-hidden relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-transparent dark:before:from-white/5 before:pointer-events-none before:rounded-2xl pb-0">
         <CardContent className="p-4 flex gap-4 relative z-10">
           {/* Left side content */}
           <div className="flex-1 flex flex-col justify-between min-h-[200px]">
@@ -117,7 +117,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog, layout = "square" }) => {
   }
 
   return (
-    <Card className="backdrop-blur-xl bg-white/20 dark:bg-[#171717] border border-[#E0E1E1/30] dark:border-[#E0E1E1/40] w-full max-w-sm rounded-2xl shadow-lg shadow-black/5 dark:shadow-black/20 transition-all duration-300 hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-black/30 hover:bg-white/30 hover:border-[#E0E1E1/40] flex flex-col overflow-hidden relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-transparent dark:before:from-white/5 before:pointer-events-none before:rounded-2xl pb-0">
+    <Card className="backdrop-blur-xl bg-white/90 dark:bg-black border border-[#E0E1E1/30] dark:border-[#E0E1E1/40] w-full max-w-sm rounded-2xl shadow-lg shadow-black/5 dark:shadow-black/20 transition-all duration-300 hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-black/30 hover:bg-white/30 hover:border-[#E0E1E1/40] flex flex-col overflow-hidden relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-transparent dark:before:from-white/5 before:pointer-events-none before:rounded-2xl pb-0">
       <Link to={`/blog/${blog.slug}`} className="block relative z-10">
         <AspectRatio ratio={16 / 9}>
           <img

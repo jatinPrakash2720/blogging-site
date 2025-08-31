@@ -1,4 +1,5 @@
-/* Authentication-specific animations and styles */
+/*
+Authentication-specific animations and styles
 @keyframes fadeSlideIn {
   to {
     opacity: 1;
@@ -23,7 +24,7 @@
   }
 }
 
-/* File upload animations and styles */
+File upload animations and styles
 @keyframes uploadProgress {
   0% {
     transform: scaleX(0);
@@ -44,7 +45,7 @@
   }
 }
 
-/* Animation classes for auth components */
+Animation classes for auth components
 .animate-element {
   opacity: 0;
   filter: blur(4px);
@@ -66,7 +67,7 @@
   animation: testimonialIn 0.6s ease-out forwards;
 }
 
-/* File upload specific styles */
+File upload specific styles
 .upload-progress {
   animation: uploadProgress 2s ease-out forwards;
 }
@@ -75,7 +76,7 @@
   animation: uploadSuccess 0.3s ease-out forwards;
 }
 
-/* Animation delay classes */
+Animation delay classes
 .animate-delay-100 {
   animation-delay: 0.1s;
 }
@@ -113,7 +114,7 @@
   animation-delay: 1.4s;
 }
 
-/* Custom checkbox styling for auth forms */
+Custom checkbox styling for auth forms
 .custom-checkbox {
   appearance: none;
   width: 1rem;
@@ -141,7 +142,7 @@
   font-weight: bold;
 }
 
-/* Glassmorphism effects for auth components */
+Glassmorphism effects for auth components
 .auth-glass {
   backdrop-filter: blur(10px);
   background: rgba(255, 255, 255, 0.1);
@@ -154,13 +155,13 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Drag and drop styles */
+Drag and drop styles
 .drag-over {
   border-color: hsl(var(--primary));
   background-color: hsl(var(--primary) / 0.05);
 }
 
-/* Image preview styles */
+Image preview styles
 .image-preview {
   transition: all 0.3s ease;
 }
@@ -169,7 +170,7 @@
   transform: scale(1.02);
 }
 
-/* Upload button hover effects */
+Upload button hover effects
 .upload-button {
   transition: all 0.2s ease;
 }
@@ -179,7 +180,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Adding all Tailwind imports and theme configuration from globals.css */
+Adding all Tailwind imports and theme configuration from globals.css
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -307,3 +308,5 @@
     @apply bg-background text-foreground font-sans;
   }
 }
+
+*/

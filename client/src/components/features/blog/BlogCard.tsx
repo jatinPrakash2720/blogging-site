@@ -32,9 +32,8 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog, layout = "square" }) => {
     return (
       <Card
         className="
-        backdrop-blur-xl 
-        bg-white/20 
-        dark:bg-[#171717]
+        bg-white/90
+        // dark:bg-primary
         border 
         border-[#E0E1E1/30] 
         dark:border-[#E0E1E1/40] 
@@ -52,8 +51,8 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog, layout = "square" }) => {
         hover:border-[#E0E1E1/40] 
         overflow-hidden
         relative
-        before:absolute
-        before:inset-0
+        // before:absolute
+        // before:inset-0
         before:bg-gradient-to-br
         before:from-white/10
         before:to-transparent
