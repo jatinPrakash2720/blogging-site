@@ -21,15 +21,20 @@ const buttonVariants = cva(
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
         authl:
-          "bg-primary text-primary-foreground shadow-xs  hover:bg-primary/90 animate-element animate-delay-900 w-full flex items-center justify-center gap-3 border border-border py-4 transition-colors",
+          "bg-primary text-primary-foreground shadow-xs  hover:bg-primary/90 animate-element animate-delay-900 w-full flex items-center justify-center gap-3 py-4 transition-colors",
+        continuel:
+          "bg-primary text-primary-foreground shadow-xs  hover:bg-primary/90 animate-element animate-delay-900 w-[1/2] flex items-center justify-center gap-3 py-4 transition-colors",
         authd:
-          "border bg-background shadow-xs animate-element animate-delay-900 w-full flex items-center justify-center gap-3 border border-border py-4 hover:bg-secondary transition-colors",
+          "bg-background shadow-xs animate-element animate-delay-900 w-full flex items-center justify-center gap-3  py-4 hover:bg-secondary transition-colors",
+        continued:
+          "bg-background shadow-xs animate-element animate-delay-900 w-[1/2] flex items-center justify-center gap-3  py-4 hover:bg-secondary transition-colors",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
         sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
         lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
-        auth: "h-13 rounded-2xl py-4 has-[>svg]:px-5",
+        auth: "rounded-2xl py-3 has-[>svg]:px-5",
+        continue: "rounded-2xl py-3 has-[>svg]:px-3.5",
         icon: "size-9",
       },
     },

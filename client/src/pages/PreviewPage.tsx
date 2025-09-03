@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Header from "@/components/layout/Header";
 import { Particles } from "@/components/common/background/Particles";
 import { Preview } from "@/components/features/blog/Preview";
@@ -7,6 +7,20 @@ import CommentSection from "@/components/features/user/CommentSection";
 import FollowSuggestions from "@/components/features/user/FollowSuggestions";
 import type { User } from "@/types/api";
 import ParticleBackground from "@/components/common/background/ParticeBackground";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/common/wrappers/DropdownMenu";
+import {
+  Heart,
+  MessageCircle,
+  Share2,
+  Bookmark,
+  MoreHorizontal,
+} from "lucide-react";
 
 // Mock data for the author
 const mockAuthor: User = {
@@ -22,29 +36,73 @@ const mockAuthor: User = {
   updatedAt: new Date().toISOString(), // Added missing field
 };
 
+const BlogActionBar = () => {
+  return (
+    <div className="flex items-center justify-between w-full px-3  dark:bg-background/50  bg-background/10 backdrop-blur-lg border border-border rounded-xl rounded-t-none shadow-sm">
+      {/* Left side actions: Like, Comment, Share */}
+      <div className="flex items-center gap-2">
+        <Button variant="ghost" size="sm" className="flex items-center gap-2">
+          <Heart className="w-4 h-4" />
+          <span className="text-xs">Like</span>
+        </Button>
+        <Button variant="ghost" size="sm" className="flex items-center gap-2">
+          <MessageCircle className="w-4 h-4" />
+          <span className="text-xs">Comment</span>
+        </Button>
+        <Button variant="ghost" size="sm" className="flex items-center gap-2">
+          <Share2 className="w-4 h-4" />
+          <span className="text-xs">Share</span>
+        </Button>
+      </div>
+
+      {/* Right side actions: Save and More Options */}
+      <div className="flex items-center gap-2">
+        <Button variant="ghost" size="icon">
+          <Bookmark className="w-4 h-4" />
+        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <MoreHorizontal className="w-4 h-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem>Report this content</DropdownMenuItem>
+            <DropdownMenuItem>Copy link</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </div>
+  );
+};
 
 export default function BlogPreviewPage() {
+  const [headerHeight, setHeaderHeight] = useState(0);
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Header onHeightChange={() => {}} disableScrollEffect={true} />
-      <div className="relative flex-grow w-full">
-        <ParticleBackground className="fixed inset-0 -z-10" quantity={250} />
-        <main className="container mx-auto py-8 px-0 grid grid-cols-1 lg:grid-cols-8 gap-4">
-          {/* Left Sidebar */}
-          <aside className="hidden lg:block lg:col-span-2 space-y-8">
-            <AuthorProfileCard author={mockAuthor} />
-            <FollowSuggestions />
-          </aside>
+    <div className="min-h-screen flex flex-col">
+      <Header onHeightChange={setHeaderHeight} disableScrollEffect={true} />
+      <div
+        className="relative flex-grow w-full "
+        style={{ paddingTop: `${headerHeight}px` }}
+      >
+        <ParticleBackground
+          className="fixed inset-0 -z-10"
+          // quantity={250}
+        />
+        <main className="container mx-auto py-4 flex justify-center items-center">
+          {/* Centered content column */}
+          <div className="mx-auto space-y-4">
+            {/* Author card now sits above the preview */}
+            <div>
+              <AuthorProfileCard author={mockAuthor} />
+            <BlogActionBar  />
+            </div>
 
-          {/* Main Content: Blog Preview */}
-          <div className="lg:col-span-4">
+            {/* Main Blog Preview Content */}
             <Preview />
-          </div>
 
-          {/* Right Sidebar: Comments */}
-          <aside className="lg:col-span-2">
-            <CommentSection />
-          </aside>
+            {/* New Action Bar */}
+          </div>
         </main>
       </div>
     </div>

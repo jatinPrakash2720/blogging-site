@@ -47,7 +47,7 @@ export default function Header({ onHeightChange, disableScrollEffect = false }: 
       <header ref={headerRef} className="fixed top-0 left-0 right-0 z-50">
         <div className={`transition-all duration-500 ease-in-out mt-0`}>
           <nav
-            className={`transition-all dark:bg-[#000000] bg-[#ffffff] duration-500 ease-in-out backdrop-blur-md border-none rounded-none mx-0 shadow-lg`}
+            className={`transition-all  dark:bg-background/50 bg-background/10 backdrop-blur-lg duration-500 ease-in-out  border-none rounded-none mx-0 shadow-lg`}
           >
             <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8`}>
               <div className="flex items-center justify-between h-16">
@@ -126,7 +126,7 @@ export default function Header({ onHeightChange, disableScrollEffect = false }: 
           className={`transition-all duration-500 ease-in-out  ${isScrolled ? "mt-0" : "mt-4"}`}
         >
           <nav
-            className={`transition-all dark:bg-[#000000] bg-[#ffffff] duration-500 ease-in-out backdrop-blur-md ${isScrolled ? "border-none rounded-none mx-0 shadow-lg" : "border border-[#E0E1E1/30] dark:border-[#E0E1E1/40] rounded-2xl mx-4 shadow-md"}`}
+            className={`transition-all dark:bg-background/50 bg-background/10 duration-500 ease-in-out backdrop-blur-md ${isScrolled ? "border-none rounded-none mx-0 shadow-lg" : "border border-[#E0E1E1/30] dark:border-[#E0E1E1/40] rounded-2xl mx-4 shadow-md"}`}
           >
             <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8`}>
               <div className="flex items-center justify-between h-16">

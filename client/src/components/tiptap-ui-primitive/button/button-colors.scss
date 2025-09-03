@@ -1,3 +1,5 @@
+@import url("../../../styles/_variables.scss");
+
 .editor-wrapper {
  .tiptap-button {
   /************************************************** 
@@ -168,12 +170,12 @@
     .editor-dark & {
       --tt-button-default-bg-color: var(--transparent);
       --tt-button-hover-bg-color: var(--tt-gray-dark-200);
-      --tt-button-active-bg-color: var(--tt-gray-dark-a-100);
+      --tt-button-active-bg-color: var(--tt-gray-dark-a-900);
       --tt-button-active-bg-color-emphasized: var(
         --tt-brand-color-900
       ); //more important active state
       --tt-button-active-bg-color-subdued: var(
-        --tt-gray-dark-a-100
+        --tt-gray-dark-a-900
       ); //less important active state
       --tt-button-active-hover-bg-color: var(--tt-gray-dark-200);
       --tt-button-active-hover-bg-color-emphasized: var(

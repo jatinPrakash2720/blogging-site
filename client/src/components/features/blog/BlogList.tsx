@@ -1,5 +1,5 @@
 import type React from "react";
-import BlogCard from "./BlogCard1";
+import BlogCard from "./BlogCard";
 import type { LayoutType } from "../../common/subComps/layout-toggle";
 
 interface BlogListProps {

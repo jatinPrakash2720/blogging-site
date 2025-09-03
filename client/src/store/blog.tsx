@@ -27,20 +27,22 @@ export const BlogProvider: React.FC<contextInterfaces.BlogProviderProps> = ({
   const [userBlogs, setUserBlogs] = useState<Blog[]>([]);
   const [readHistory, setReadHistory] = useState<Blog[]>([]);
   const [feedBlogs, setFeedBlogs] = useState<Blog[]>([]);
-  const [feedPagination, setFeedPagination] = useState<apiInterfaces.PaginatedBlogResponse | null>(null);
+  const [feedPagination, setFeedPagination] =
+    useState<apiInterfaces.PaginatedBlogResponse | null>(null);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingSingleBlog, setLoadingSingleBlog] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [pagination, setPagination] =
-    useState<apiInterfaces.PaginatedBlogResponse | null>(null);
+  const [pagination] = useState<apiInterfaces.PaginatedBlogResponse | null>(
+    null
+  );
   const [userBlogsPagination, setUserBlogsPagination] =
     useState<apiInterfaces.PaginatedBlogResponse | null>(null);
   const [readHistoryPagination, setReadHistoryPagination] =
     useState<apiInterfaces.PaginatedBlogResponse | null>(null);
 
-    const { currentUser } = useAuth();
+  const { currentUser } = useAuth();
   const updatePaginationState = useCallback(
     (
       data: apiInterfaces.PaginatedBlogResponse,
@@ -53,24 +55,24 @@ export const BlogProvider: React.FC<contextInterfaces.BlogProviderProps> = ({
     []
   );
 
-  const fetchAllBlogs = useCallback(
-    async (params: apiInterfaces.GetBlogsParams = {}) => {
-      await requestHandler(
-        () => blogService.getBlogs(params),
-        setLoading,
-        (response) => {
-          console.log(response);
-          const { blogs } = response;
-          // console.log(data);
-          console.log(blogs);
-          setAllBlogs(blogs);
-          updatePaginationState(data, setPagination);
-        },
-        setError
-      );
-    },
-    [updatePaginationState]
-  );
+  // const fetchAllBlogs = useCallback(
+  //   async (params: apiInterfaces.GetBlogsParams = {}) => {
+  //     await requestHandler(
+  //       () => blogService.getBlogs(params),
+  //       setLoading,
+  //       (response) => {
+  //         console.log(response);
+  //         const { blogs } = response;
+  //         // console.log(data);
+  //         console.log(blogs);
+  //         setAllBlogs(blogs);
+  //         updatePaginationState(data, setPagination);
+  //       },
+  //       setError
+  //     );
+  //   },
+  //   [updatePaginationState]
+  // );
 
   const fetchSingleBlog = useCallback(async (blogId: string) => {
     await requestHandler(
@@ -169,90 +171,94 @@ export const BlogProvider: React.FC<contextInterfaces.BlogProviderProps> = ({
       return success;
     },
     []
+  );
+
+  const toggleBlogStatusAction = useCallback(async (blogId: string) => {
+    let success = false;
+    await requestHandler(
+      () => blogService.toggleBlogStatus(blogId),
+      setLoading,
+      (response) => {
+        const data = response.data;
+        const updater = (blog: apiInterfaces.Blog): apiInterfaces.Blog =>
+          blog._id === blogId
+            ? {
+                ...blog,
+                isPublished: Boolean(data.isPublished),
+                status: data.status as "draft" | "published" | "archived",
+                updatedAt: data.updatedAt,
+              }
+            : blog;
+        setAllBlogs((prev) => prev.map(updater));
+        setUserBlogs((prev) => prev.map(updater));
+        setCurrentBlog((prev) =>
+          prev && prev._id === blogId ? updater(prev) : prev
+        );
+        success = true;
+      },
+      setError
     );
-    
-    const toggleBlogStatusAction = useCallback(async (blogId: string) => {
-        let success = false;
-        await requestHandler(
-            () => blogService.toggleBlogStatus(blogId),
-            setLoading,
-            (response) => {
-                const data = response.data;
-                const updater = (
-                  blog: apiInterfaces.Blog
-                ): apiInterfaces.Blog =>
-                  blog._id === blogId
-                    ? {
-                        ...blog,
-                        isPublished: Boolean(data.isPublished),
-                        status: data.status as 'draft' | 'published' | 'archived',
-                        updatedAt: data.updatedAt,
-                      }
-                    : blog;
-                setAllBlogs((prev) => prev.map(updater));
-                setUserBlogs((prev) => prev.map(updater));
-                setCurrentBlog((prev) => (prev && prev._id === blogId ? updater(prev) : prev));
-                success = true;
-            },
-            setError
-        );
-        return success;
-    }, []);
+    return success;
+  }, []);
 
-      const fetchUserBlogs = useCallback(
-        async (params: apiInterfaces.GetUserBlogsParams) => {
-          await requestHandler(
-            () => userService.getUserBlogs(params),
-            setLoading,
-            (response) => {
-              const { data } = response;
-              setUserBlogs(data.blogs);
-              updatePaginationState(data, setUserBlogsPagination);
-            },
-            setError
-          );
+  const fetchUserBlogs = useCallback(
+    async (params: apiInterfaces.GetUserBlogsParams) => {
+      await requestHandler(
+        () => userService.getUserBlogs(params),
+        setLoading,
+        (response) => {
+          const { data } = response;
+          setUserBlogs(data.blogs);
+          updatePaginationState(data, setUserBlogsPagination);
         },
-        [updatePaginationState]
+        setError
       );
+    },
+    [updatePaginationState]
+  );
 
-    const deleteBlogAction = useCallback(async (blogId: string) => {
-        let success = false;
-        await requestHandler(
-            () => blogService.deleteBlog(blogId),
-            setLoading,
-            () => {
-                setAllBlogs((prev) => prev.filter((blog) => blog._id !== blogId));
-                setUserBlogs((prev) => prev.filter((blog) => blog._id !== blogId));
-                if (currentBlog && currentBlog._id === blogId) {
-                    setCurrentBlog(null);
-                }
-                success = true;
-            },
-            setError
-        );
-        return success;
-    }, [currentBlog]);
-    
-    const restoreBlogAction = useCallback(async (blogId: string) => {
-        let success = false;
-        await requestHandler(
-            () => blogService.restoreBlog(blogId),
-            setLoading,
-            async () => {
-                success = true;
-                if (currentBlog && currentBlog._id === blogId) {
-                    await fetchSingleBlog(blogId);
-                }
-                if (currentUser && currentUser._id) {
-                    await fetchUserBlogs({ userId: currentUser._id });
-                }
-            },
-            setError
-        );
-        return success;
-    }, [currentBlog, currentUser, fetchSingleBlog, fetchUserBlogs]);
+  const deleteBlogAction = useCallback(
+    async (blogId: string) => {
+      let success = false;
+      await requestHandler(
+        () => blogService.deleteBlog(blogId),
+        setLoading,
+        () => {
+          setAllBlogs((prev) => prev.filter((blog) => blog._id !== blogId));
+          setUserBlogs((prev) => prev.filter((blog) => blog._id !== blogId));
+          if (currentBlog && currentBlog._id === blogId) {
+            setCurrentBlog(null);
+          }
+          success = true;
+        },
+        setError
+      );
+      return success;
+    },
+    [currentBlog]
+  );
 
-
+  const restoreBlogAction = useCallback(
+    async (blogId: string) => {
+      let success = false;
+      await requestHandler(
+        () => blogService.restoreBlog(blogId),
+        setLoading,
+        async () => {
+          success = true;
+          if (currentBlog && currentBlog._id === blogId) {
+            await fetchSingleBlog(blogId);
+          }
+          if (currentUser && currentUser._id) {
+            await fetchUserBlogs({ userId: currentUser._id });
+          }
+        },
+        setError
+      );
+      return success;
+    },
+    [currentBlog, currentUser, fetchSingleBlog, fetchUserBlogs]
+  );
 
   const fetchReadHistory = useCallback(
     async (params: apiInterfaces.PaginationParams = {}) => {
@@ -298,7 +304,7 @@ export const BlogProvider: React.FC<contextInterfaces.BlogProviderProps> = ({
     readHistoryPagination,
     feedBlogs,
     feedPagination,
-    fetchAllBlogs,
+    // fetchAllBlogs,
     fetchSingleBlog,
     createNewBlog,
     updateBlogTitleAction,

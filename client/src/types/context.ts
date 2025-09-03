@@ -61,7 +61,7 @@ export interface IBlogContext {
   readHistoryPagination: PaginatedBlogResponse | null;
   feedBlogs: Blog[];
   feedPagination: PaginatedBlogResponse | null;
-  fetchAllBlogs: (params?: GetBlogsParams) => Promise<void>;
+  // fetchAllBlogs: (params?: GetBlogsParams) => Promise<void>;
   fetchSingleBlog: (blogId: string) => Promise<void>;
   createNewBlog: (blogData: FormData) => Promise<boolean>;
   updateBlogTitleAction: (payload: UpdateBlogTitlePayload) => Promise<boolean>;

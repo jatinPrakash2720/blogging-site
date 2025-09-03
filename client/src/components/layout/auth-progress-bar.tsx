@@ -223,10 +223,10 @@ export function AuthProgressBar({
               distance > 0 ? Math.max(0.2, 1 - distance * 0.25) : 1;
 
             const iconColor = isActive
-              ? "#0ea5e9"
+              ? "#000000"
               : isCompleted
-                ? "#6b7280"
-                : "#9ca3af";
+                ? "#000000"
+                : "#000000";
 
             return (
               <motion.div

@@ -6,7 +6,6 @@
 @import "./styles/_variables.scss";
 @import "./styles/_keyframe-animations.scss";
 
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -42,6 +41,10 @@
     box-sizing: border-box;
   }
 
+  ::selection {
+    background: #ffc200; /* Use any hex color */
+    color: #000000; /* Use any hex color */
+  }
   *,
   *::before,
   *::after {

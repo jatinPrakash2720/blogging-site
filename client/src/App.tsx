@@ -4,7 +4,6 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import ProfilePage from "./pages/ProfilePage";
 import BlogDetailPage from "./pages/BlogDetailPage";
-import ComponentPlayground from "./pages/ComponentPlayground";
 import AuthPage from "./pages/AuthPage";
 import BlogEditorPage from "./pages/EditorPage";
 import BlogPreviewPage from "./pages/PreviewPage";
@@ -68,7 +67,6 @@ function App() {
       <Route path="/view" element={<SimpleEditorTrial />} />
       <Route path="/preview" element={<BlogPreview content={content} />} /> */}
       {/* Development/Testing Route */}
-      <Route path="/playground" element={<ComponentPlayground />} />
     </Routes>
   );
 }

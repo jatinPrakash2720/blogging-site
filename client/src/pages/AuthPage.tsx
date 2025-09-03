@@ -212,6 +212,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ mode }) => {
             onRestorePassword={handleRestorePassword}
             onGoToSignIn={handleGoToSignIn}
             heroImageSrc="https://images.unsplash.com/photo-1528460033278-a6457c209501?q=80&w=1912&auto=format&fit=crop"
+            onGoBack={handleGoBack}
           />
         );
 

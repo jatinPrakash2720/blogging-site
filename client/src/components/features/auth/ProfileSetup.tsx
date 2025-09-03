@@ -72,17 +72,17 @@ export const ProfileSetup: React.FC<ProfileSetupProps> = ({
   };
 
   return (
-    <div className="min-h-[100dvh] flex items-center justify-center p-8 font-sans">
-      <div className="w-full max-w-lg">
+    <div className="h-[100vh] flex flex-col md:flex-row font-sans w-[100vw] flex-1 items-center justify-center p-4 overflow-hidden ">
+      <div className="w-full max-w-md  py-4 px-8  hover:shadow-3xl bg-white/50 dark:bg-black/40 backdrop-blur-xl border dark:border-white/10 border-black/10 rounded-[32px] shadow-2xl transform transition-all duration-300 hover:shadow-3xl">
         <div className="flex flex-col gap-8">
           {/* Header */}
           <div className="animate-app-zoom-in duration-[0.4s] text-center animate-element animate-delay-100">
             <h1 className="text-4xl md:text-5xl font-semibold leading-tight mb-2">
-              <span className="font-light text-foreground tracking-tighter">
+              <span className="font-light text-foreground dark:text-muted-foreground tracking-tighter">
                 Setup Your Profile
               </span>
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-foreground dark:text-muted-foreground">
               Click on the avatar or cover area to upload your images
             </p>
           </div>
@@ -131,7 +131,7 @@ export const ProfileSetup: React.FC<ProfileSetupProps> = ({
                     </button>
                   </>
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-r from-blue-100 to-blue-300 dark:from-blue-900/30 group-hover:bg-primary dark:to-blue-300/30 flex items-center justify-center">
+                  <div className="w-full h-full bg-gradient-to-r from-yellow-600 to-amber-600/40 dark:from-yellow-700/30 group-hover:bg-primary dark:to-yellow-950/30 flex items-center justify-center">
                     <div className="text-center text-muted-foreground group-hover:opacity-0 group-hover:text-foreground  transition-colors">
                       <Camera className="w-8 h-8 mx-auto mb-1" />
                       <p className="text-sm font-medium group-hover:opacity-0">
@@ -250,7 +250,7 @@ export const ProfileSetup: React.FC<ProfileSetupProps> = ({
           <div className="flex gap-4 animate-element animate-delay-300">
             <button
               onClick={onSkip}
-              className="flex-1 rounded-2xl border border-border py-4 font-medium hover:bg-secondary transition-colors"
+              className="flex-1 rounded-2xl  py-4 bg-primary text-primary-foreground hover:bg-primary/90 font-medium transition-colors"
             >
               Skip for Now
             </button>

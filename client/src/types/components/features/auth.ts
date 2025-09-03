@@ -35,6 +35,7 @@ export interface RestorePasswordProps {
   testimonials?: Testimonial[];
   onRestorePassword?: (password: string) => Promise<boolean>;
   onGoToSignIn?: () => void;
+  onGoBack?: () => void;
 }
 
 //Profile Setup Page

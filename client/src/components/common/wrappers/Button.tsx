@@ -7,7 +7,7 @@ import type { VariantProps } from "class-variance-authority";
 interface CustomButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
-  intent?: "primary" | "secondary" | "danger" | "authl" |"authd" ;
+  intent?: "primary" | "secondary" | "danger" | "authl" |"authd"|"continued"|"continuel" ;
   fullWidth?: boolean;
 }
 
@@ -31,7 +31,9 @@ const Button = React.forwardRef<HTMLButtonElement, CustomButtonProps>(
       secondary: "secondary",
       danger: "destructive",
       authl: "authl",
-      authd:"authd"
+      authd: "authd",
+      continued: "continued",
+      continuel:"continuel"
     } as const; // Ensure literal types for type safety
 
     // 4. Use the mapped variant or explicit variant, ensuring type safety

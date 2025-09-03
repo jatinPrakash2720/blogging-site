@@ -21,9 +21,9 @@
   &::-webkit-scrollbar-track {
     background: transparent;
   }
-  width: 56vw;
+  width: 80vw;
 
-  height: 70vh;
+  height: 60vh;
   overflow: auto;
   border-radius: 7px;
   background-color: #ffffff;
@@ -43,8 +43,8 @@
   .dark & {
     border: 1px solid;
     border-color: rgba(224, 225, 225, 0.2);
-    // --tt-theme-text: rgba(245, 245, 245, 1);
-    // --tt-bg-color: #000000;
+    /* // --tt-theme-text: rgba(245, 245, 245, 1);
+    // --tt-bg-color: #000000; */
 
     background-color: black;
     box-shadow:
