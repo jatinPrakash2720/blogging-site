@@ -1,5 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-
+import { Routes, Route, Navigate} from "react-router-dom";
 // Import your page components
 import HomePage from "./pages/HomePage";
 import ProfilePage from "./pages/ProfilePage";
@@ -7,11 +6,13 @@ import BlogDetailPage from "./pages/BlogDetailPage";
 import AuthPage from "./pages/AuthPage";
 import BlogEditorPage from "./pages/EditorPage";
 import BlogPreviewPage from "./pages/PreviewPage";
+import {ProfilePage as UserProfilePage} from "./pages/UserProfilePage";
 function App() {
   return (
-    <Routes>
+    <Routes location={location} key={location.pathname}>
       {/* Main App Routes */}
       <Route path="/" element={<HomePage />} />
+      <Route path="/profile" element={<UserProfilePage />} />
       <Route path="/profile/:username" element={<ProfilePage />} />
       <Route path="/blog/:slug" element={<BlogDetailPage />} />
 
@@ -34,8 +35,6 @@ function App() {
         path="/auth/restore-password/:token"
         element={<AuthPage mode="reset-password" />}
       />
-
-
 
       {/* Auth Legacy Routes - Redirecting to new unified auth system */}
       <Route path="/login" element={<Navigate to="/auth/login" replace />} />

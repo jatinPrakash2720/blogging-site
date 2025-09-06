@@ -4,23 +4,6 @@
   
   ******************/
 .preview-wrapper {
-  &::-webkit-scrollbar {
-    width: 0.25rem;
-  }
-
-  & * {
-    scrollbar-width: thin;
-    scrollbar-color: var(--tt-scrollbar-color) transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: var(--tt-scrollbar-color);
-    border-radius: 9999px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
   width: 80vw;
 
   height: 60vh;
@@ -58,6 +41,24 @@
         0 10px 10px -5px rgba(0, 0, 0, 0.3);
     }
   }
+  &::-webkit-scrollbar {
+    width: 0.25rem;
+  }
+
+  & * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--tt-scrollbar-color) transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--tt-scrollbar-color);
+    border-radius: 9999px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
 }
 
 .preview-content {

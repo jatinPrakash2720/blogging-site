@@ -221,7 +221,11 @@ const AuthPage: React.FC<AuthPageProps> = ({ mode }) => {
     }
   };
 
-  return <AuthLayout>{renderAuthComponent()}</AuthLayout>;
+  return (
+    <AuthLayout>
+      {renderAuthComponent()}
+    </AuthLayout>
+  );
 };
 
 export default AuthPage;

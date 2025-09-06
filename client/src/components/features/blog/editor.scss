@@ -1,23 +1,5 @@
 .editor-wrapper {
-  &::-webkit-scrollbar {
-    width: 0.25rem;
-  }
-
-  & * {
-    scrollbar-width: thin;
-    scrollbar-color: var(--tt-scrollbar-color) transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: var(--tt-scrollbar-color);
-    border-radius: 9999px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  /****************** 
+   /****************** 
   Editor wrapper styles
   ******************/
   width: 80vw;
@@ -42,6 +24,26 @@
     color: var(--tt-gray-light-900);
     transition: color 0.3s ease;
   }
+  
+  &::-webkit-scrollbar {
+    width: 0.25rem;
+  }
+
+  & * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--tt-scrollbar-color) transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--tt-scrollbar-color);
+    border-radius: 9999px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+ 
 }
 .editor-dark {
   --tt-theme-text: var(--tt-gray-dark-900);

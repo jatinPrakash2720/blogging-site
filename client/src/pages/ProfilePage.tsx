@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-
+export type ProfileView = "profile" | "library" | "stories" | "stats";
 const ProfilePage: React.FC = () => {
   const { username } = useParams();
   return (
