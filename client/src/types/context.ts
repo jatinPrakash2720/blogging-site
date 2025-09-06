@@ -7,6 +7,7 @@ import type {
   GetBlogsParams,
   UpdateBlogTitlePayload,
   UpdateBlogContentPayload,
+  UpdateBlogDetailsPayload,
   UpdateBlogThumbnailPayload,
   GetUserBlogsParams,
   PaginationParams,
@@ -63,7 +64,14 @@ export interface IBlogContext {
   feedPagination: PaginatedBlogResponse | null;
   // fetchAllBlogs: (params?: GetBlogsParams) => Promise<void>;
   fetchSingleBlog: (blogId: string) => Promise<void>;
-  createNewBlog: (blogData: FormData) => Promise<boolean>;
+  initiateBlogCreation: (data: {
+    title: string;
+    content: object;
+  }) => Promise<Blog | null>;
+  updateBlogDetailsAction: (
+    payload: UpdateBlogDetailsPayload
+  ) => Promise<boolean>;
+
   updateBlogTitleAction: (payload: UpdateBlogTitlePayload) => Promise<boolean>;
   updateBlogContentAction: (
     payload: UpdateBlogContentPayload
@@ -71,7 +79,6 @@ export interface IBlogContext {
   updateBlogThumbnailAction: (
     payload: UpdateBlogThumbnailPayload
   ) => Promise<boolean>;
-
   toggleBlogStatusAction: (blogId: string) => Promise<boolean>;
   deleteBlogAction: (blogId: string) => Promise<boolean>;
   restoreBlogAction: (blogId: string) => Promise<boolean>;

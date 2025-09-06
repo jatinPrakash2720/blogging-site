@@ -106,6 +106,12 @@ export interface GetBlogsParams extends PaginationParams {
   q?: string;
 }
 
+export interface UpdateBlogDetailsPayload{
+  blogId: string;
+  status: "published" |"draft";
+  thumbnail?: File;
+}
+
 export interface UpdateBlogTitlePayload {
   blogId: string;
   newTitle: string;

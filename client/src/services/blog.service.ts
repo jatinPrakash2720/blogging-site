@@ -14,10 +14,21 @@ export const getBlog = (blogId: string) => {
   );
 };
 
-export const createBlog = (data: FormData) => {
+export const createBlog = (data: { title: string; content:object}) => {
   return apiClient.post<ApiResponse<{ data: apiInterfaces.Blog }>>(
     "/blogs",
     data
+  );
+};
+
+export const updateBlogDetails = ({ blogId, status, thumbnail, }: apiInterfaces.UpdateBlogDetailsPayload) => {
+  const formData = new FormData();
+  formData.append("status", status);
+  if (thumbnail) {
+    formData.append("thumbnail", thumbnail);
+  }
+  return apiClient.patch<ApiResponse<{ data: apiInterfaces.Blog }>>(
+    `/blogs/${blogId}/details`, formData
   );
 };
 
