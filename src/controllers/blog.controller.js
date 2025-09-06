@@ -6,9 +6,10 @@ import { UserFollow } from "../models/userFollow.model.js";
 import {
   deleteFromCloudinary,
   uploadOnCloudinary,
-} from "../utils/Cloudinary.util.js";
+} from "../utils/cloudinary.util.js";
 import { IMAGE_FOLDERS } from "../constants.js";
 import { Category } from "../models/category.model.js";
+import { generateExcerpt, generateSlug } from "../utils/genSlugAndExcerpt.utils.js";
 
 const getBlogs = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page, 10) || 1;
@@ -193,75 +194,92 @@ const getBlogsByUserId = asyncHandler(async (req, res) => {
 });
 
 const createBlog = asyncHandler(async (req, res) => {
-  try {
-    const { title, slug, content, status } = req.body;
-    const thumbnailLocalPath = req.file?.path;
+   const { title, content} = req.body;
 
-    if ([title, slug, content, status].some((field) => field?.trim() === "")) {
-      throw new ApiError(400, "All Fields are required"); // Corrected typo
-    }
-    if (!thumbnailLocalPath) {
-      throw new ApiError(400, "Thumbnail is required");
-    }
+   if ([title, content].some((field) => field?.trim() === "")) {
+     throw new ApiError(400, "All Fields are required"); // Corrected typo
+   }
+   
+   const slug = generateSlug(title);
+   const excerpt = generateExcerpt(content);
 
-    const existingBlog = await Blog.findOne({
-      owner: req.user._id,
-      slug: slug.toLowerCase(),
-    });
+   const existingBlog = await Blog.findOne({
+     owner: req.user._id,
+     slug: slug,
+   });
 
-    // CORRECTED LOGIC: If a blog with the same slug by the same owner EXISTS, throw an error.
-    if (existingBlog) {
-      throw new ApiError(
-        409,
-        "You already have a blog with this slug. Please choose a different one."
-      );
-    }
-
-    const thumbnail = await uploadOnCloudinary(
-      thumbnailLocalPath,
-      IMAGE_FOLDERS.THUMBNAIL
-    );
-
-    // CORRECTED: Check for thumbnail.url
-    if (!thumbnail || !thumbnail.url) {
-      throw new ApiError(500, "Error while uploading thumbnail to Cloudinary");
-    }
-
-    const blog = await Blog.create({
-      title: title,
-      slug: slug.toLowerCase(),
-      content: content, // Ensure content is passed
-      thumbnail: thumbnail.url,
-      owner: req.user._id,
-      status: status,
-      isPublished: status === "published",
-      // isDeleted and deletedAt will default to false/null as per schema
-    });
-
-    const createdBlog = await Blog.findById(blog._id).select("-__v");
-
-    if (!createdBlog) {
-      throw new ApiError(500, "Something went wrong while creating the blog");
-    }
-
-    return res
-      .status(201)
-      .json(new ApiResponse(201, createdBlog, "Blog created Successfully")); // CORRECTED: Return createdBlog
-  } catch (error) {
-    if (error instanceof ApiError) {
-      throw error;
-    }
-    // Handle Mongoose duplicate key error specifically if it occurs due to the index
-    if (error.code === 11000) {
-      // MongoDB duplicate key error code
-      throw new ApiError(
-        409,
-        "A blog with this slug already exists for your account."
-      );
-    }
-    throw new ApiError(500, error.message || "Internal Error");
+   // CORRECTED LOGIC: If a blog with the same slug by the same owner EXISTS, throw an error.
+   if (existingBlog) {
+     throw new ApiError(
+       409,
+       "You already have a blog with this slug. Please choose a different one."
+     );
   }
+  const blog = await Blog.create({
+     title: title,
+     slug: slug,
+     content: content, // Ensure content is passed
+     excerpt: excerpt,
+     thumbnail: "",
+     owner: req.user._id,
+     status: "pending",
+     isPublished: false,
+     // isDeleted and deletedAt will default to false/null as per schema
+   });
+  
+  const createdBlog = await Blog.findById(blog._id).select("-__v");
+
+   if (!createdBlog) {
+     throw new ApiError(500, "Something went wrong while creating the blog");
+   }
+
+   return res
+     .status(201)
+     .json(new ApiResponse(201, createdBlog, "Blog created Successfully"));
 });
+
+const updateBlogDetails = asyncHandler(async (req, res) => {
+
+  const { blogId } = req.params;
+  const { status } = req.body;
+
+  const thumbnailLocalPath = req.file?.path;
+  if (!status || !["draft", "published"].includes(status)) {
+    throw new ApiError(400, "A valid status ('draft' or 'published') is required.");
+  }
+
+  const blog = await Blog.findById(blogId);
+  if (!blog) {
+    throw new ApiError(404, "Blog not found.");
+  }
+  if (blog.owner.toString() !== req.user._id.toString()) {
+    throw new ApiError(403, "You are not authorized to update this blog.");
+  }
+
+  if (thumbnailLocalPath) {
+    const cloudinaryResponse = await uploadOnCloudinary(
+      thumbnailLocalPath,
+      {
+        folder: IMAGE_FOLDERS.THUMBNAIL,
+        blogId: blog._id,
+      }
+    );
+    if (!cloudinaryResponse?.url) {
+      throw new ApiError(500, "Thumbnail upload failed. Please Try again.");
+    }
+
+    blog.thumbnail = cloudinaryResponse.url;
+  }
+
+  blog.status = status;
+  blog.isPublished = status === "published";
+
+  await blog.save({ validateBeforeSave: false });
+
+  const updatedBlog = await Blog.findById(blog._id).select("-__v");
+
+  return res.status(200).json(new ApiResponse(200, updatedBlog, "Blog details updated successfully."));
+})
 
 const updateBlogTitle = asyncHandler(async (req, res) => {
   try {
@@ -349,7 +367,10 @@ const updateBlogThumbnail = asyncHandler(async (req, res) => {
 
     const newThumbnail = await uploadOnCloudinary(
       newThumbnailLocalPath,
-      IMAGE_FOLDERS.THUMBNAIL
+      {
+        folder: IMAGE_FOLDERS.THUMBNAIL,
+        blogId:blogId,
+      }
     );
     // CORRECTED: Check for newThumbnail existence and its URL
     if (!newThumbnail || !newThumbnail.url) {
@@ -691,6 +712,7 @@ export {
   getBlog,
   getBlogsByUserId,
   createBlog,
+  updateBlogDetails,
   updateBlogTitle,
   updateBlogContent,
   updateBlogThumbnail,

@@ -5,18 +5,19 @@ import { Blog } from "../models/blog.model.js";
 import {
   deleteFromCloudinary,
   uploadOnCloudinary,
-} from "../utils/Cloudinary.util.js";
+} from "../utils/cloudinary.util.js";
 import { generateAccessAndRefreshToken } from "../utils/genAccessAndRefreshToken.util.js";
 import { ApiError } from "../utils/ApiError.util.js";
 import jwt from "jsonwebtoken";
 import { IMAGE_FOLDERS } from "../constants.js";
 import { sendEmail } from "../utils/mailer.util.js";
 import crypto from "crypto";
-import bcrypt from "bcrypt"; 
+
 const option = {
   httpOnly: true,
   secure: true,
 };
+
 const registerUser = asyncHandler(async (req, res) => {
   const { username, fullName, email, password } = req.body;
 
@@ -31,34 +32,33 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(409, "User with email or username already exists");
   }
 
-  const avatarLocalPath = req.files?.avatar?.[0]?.path;
-  const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
+  // const avatarLocalPath = req.files?.avatar?.[0]?.path;
+  // const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
 
-  if (!avatarLocalPath) {
-    throw new ApiError(400, "Avatar file is required");
-  }
+  // if (!avatarLocalPath) {
+  //   throw new ApiError(400, "Avatar file is required");
+  // }
 
-  const avatar = await uploadOnCloudinary(
-    avatarLocalPath,
-    IMAGE_FOLDERS.AVATAR
-  );
-  if (!avatar) {
-    throw new ApiError(500, "Avatar upload failed. Please try again.");
-  }
+  // const avatar = await uploadOnCloudinary(
+  //   avatarLocalPath,{folder:IMAGE_FOLDERS.AVATAR, userId:}
+  // );
+  // if (!avatar) {
+  //   throw new ApiError(500, "Avatar upload failed. Please try again.");
+  // }
 
-  // Only upload cover image if a path exists
-  let coverImage = null;
-  if (coverImageLocalPath) {
-    coverImage = await uploadOnCloudinary(
-      coverImageLocalPath,
-      IMAGE_FOLDERS.COVER
-    );
-  }
+  // // Only upload cover image if a path exists
+  // let coverImage = null;
+  // if (coverImageLocalPath) {
+  //   coverImage = await uploadOnCloudinary(
+  //     coverImageLocalPath,
+  //     IMAGE_FOLDERS.COVER
+  //   );
+  // }
 
   const user = await User.create({
     fullName,
-    avatar: avatar.url,
-    coverImage: coverImage?.url || "", // Safely access the URL
+    avatar: "",
+    coverImage:"", // Safely access the URL
     email,
     username: username.toLowerCase(),
     password,
@@ -282,8 +282,10 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
   }
   const avatar = await uploadOnCloudinary(
     avatarLocalPath,
-    IMAGE_FOLDERS.AVATAR
-  );
+    {
+      folder: IMAGE_FOLDERS.AVATAR,
+      userId: req.user?._id
+    });
 
   if (!avatar.url) {
     throw new ApiError(408, "Error while uploading on Cloudinary");
@@ -307,7 +309,10 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
   }
   const coverImage = await uploadOnCloudinary(
     coverImageLocalPath,
-    IMAGE_FOLDERS.COVER
+    {
+      folder: IMAGE_FOLDERS.COVER,
+      userId: req.user?._id
+    }
   );
 
   if (!coverImage.url) {
@@ -560,7 +565,6 @@ const forgotPassword = asyncHandler(async (req, res) => {
     throw new ApiError(500, error.message || "Email could not be sent");
   }
 });
-
 const restorePassword = asyncHandler(async (req, res) => {
   const { password } = req.body;
 

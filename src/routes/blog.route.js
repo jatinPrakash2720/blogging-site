@@ -11,6 +11,7 @@ import {
   restoreBlog,
   toggleBlogStatus,
   updateBlogContent,
+  updateBlogDetails,
   updateBlogThumbnail,
   updateBlogTitle,
 } from "../controllers/blog.controller.js";
@@ -19,7 +20,8 @@ const router = Router();
 router.use(verifyJWT);
 
 router.route("/").get(getBlogs);
-router.route("/").post(upload.single("thumbnail"), createBlog);
+router.route("/").post(createBlog);
+router.route("/:blogId/details").patch(upload.single("thumbnail"), updateBlogDetails);
 router.route("/:blogId").get(getBlog);
 router.route("/:blogId/title").patch(updateBlogTitle);
 router.route("/:blogId/content").patch(updateBlogContent);

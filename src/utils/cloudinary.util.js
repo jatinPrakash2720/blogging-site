@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
+import { IMAGE_FOLDERS } from "../constants";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -7,11 +8,31 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const uploadOnCloudinary = async (localFilePath, folder) => {
+const uploadOnCloudinary = async (localFilePath, options = {}) => {
+  const { folder, userId, blogId } = options;
   try {
     if (!localFilePath) return null;
-    const filename = `${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-    const publicId = folder ? `${folder}/${filename}` : filename;
+    if (!folder) throw new Error("Image Folder type is required for upload.");
+
+    const uniqueSuffix = `${Date.now()}_${Math.random().toString(36).substring(2,8)}`;
+
+    let filename;
+    switch (folder) {
+      case IMAGE_FOLDERS.AVATAR:
+      case IMAGE_FOLDERS.COVER:
+        if (!userId) throw new Error("A userId is required for avatar and covers.");
+        filename = `${folder.slice(0, -1)}-${userId}-${uniqueSuffix}`;
+        break;
+      
+      case IMAGE_FOLDERS.THUMBNAIL:
+      case IMAGE_FOLDERS.BLOG_CONTENT:
+        if (!blogId) throw new Error("A blogId is required for thumbnail and blog content.");
+        filename = `${folder.slice(0, -1)}-${blogId}-${uniqueSuffix}`;
+        break;
+      default:
+        throw new Error("Invalid image folder type specified.");
+    }
+    const publicId = `${folder}/${filename}`;
 
     const response = await cloudinary.uploader.upload(localFilePath, {
       public_id: publicId,
@@ -33,7 +54,7 @@ const uploadOnCloudinary = async (localFilePath, folder) => {
 
 const deleteFromCloudinary = async (imageUrl) => {
   try {
-    if (!imageUrl) return null;
+    if (!imageUrl || imageUrl.length==0) return null;
     const publicId = imageUrl.split("/").pop().split(".")[0];
 
     const response = await cloudinary.uploader.destroy(publicId, {
