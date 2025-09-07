@@ -32,28 +32,6 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(409, "User with email or username already exists");
   }
 
-  // const avatarLocalPath = req.files?.avatar?.[0]?.path;
-  // const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
-
-  // if (!avatarLocalPath) {
-  //   throw new ApiError(400, "Avatar file is required");
-  // }
-
-  // const avatar = await uploadOnCloudinary(
-  //   avatarLocalPath,{folder:IMAGE_FOLDERS.AVATAR, userId:}
-  // );
-  // if (!avatar) {
-  //   throw new ApiError(500, "Avatar upload failed. Please try again.");
-  // }
-
-  // // Only upload cover image if a path exists
-  // let coverImage = null;
-  // if (coverImageLocalPath) {
-  //   coverImage = await uploadOnCloudinary(
-  //     coverImageLocalPath,
-  //     IMAGE_FOLDERS.COVER
-  //   );
-  // }
 
   const user = await User.create({
     fullName,
@@ -76,6 +54,51 @@ const registerUser = asyncHandler(async (req, res) => {
     .status(201)
     .json(new ApiResponse(201, createdUser, "User registered successfully!"));
 });
+const updateUserProfileImages = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+
+  const avatarLocalPath = req.files?.avatar?.[0]?.path;
+  const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
+
+  if (!avatarLocalPath && !coverImageLocalPath) {
+    throw new ApiError(400, "At least one image file is required.");
+  }
+  
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  if (avatarLocalPath) {
+    const avatar = await uploadOnCloudinary(avatarLocalPath,
+      {
+        folder: IMAGE_FOLDERS.AVATAR,
+        userId: userId,
+      }
+    );
+    if (!avatar?.url) {
+      throw new ApiError(500, "Error while uploading avatar.");
+    }
+    user.avatar = avatar.url;
+  }
+
+  if (coverImageLocalPath) {
+    const coverImage = await uploadOnCloudinary(coverImageLocalPath,
+      {
+        folder: IMAGE_FOLDERS.COVER,
+        userId: userId,
+      }
+    );
+    if (!coverImage?.url) {
+      throw new ApiError(500, "Error while uploading cover image.");
+    }
+    user.coverImage = coverImage.url;
+  }
+
+  await user.save({ validateBeforeSave: false });
+
+  return res.status(200).json(new ApiResponse(200, {}, "Profile images updated successfully."));
+})
 const loginUser = asyncHandler(async (req, res) => {
   /*
   user se data lenge
@@ -548,7 +571,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
   const resetToken = user.generatePasswordResetToken();
   await user.save({ validateBeforeSave: false });
 
-  const resetUrl = `${process.env.CORS_ORIGIN.split(",")[1]}/restore-password/${resetToken}`;
+  const resetUrl = `${process.env.CORS_ORIGIN.split(",")[0]}/restore-password/${resetToken}`;
   const message = `You requested a password reset. Plic click this link to reset your password: \n\n ${resetUrl} \n\nIf you did not request this, ignore this email.`;
 
   try {
@@ -606,6 +629,7 @@ const restorePassword = asyncHandler(async (req, res) => {
 
 export {
   registerUser,
+  updateUserProfileImages,
   loginUser,
   logoutUser,
   refreshAccessToken,
