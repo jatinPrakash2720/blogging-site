@@ -14,6 +14,7 @@ import type {
   ChangePasswordData,
   ForgotPasswordPayload,
   LoginCredentials,
+  RegisterData,
   ResetPasswordPayload,
   User,
 } from "../types/api.ts";
@@ -77,17 +78,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await requestHandler(
         () => userService.loginUser(credentials),
         setLoading,
-        (response: { user: User; accessToken: string }) => {
-          const { user, accessToken } = response;
+        (response) => {
+          const { user, accessToken } = response.data;
           setCurrentUser(user);
-
           setIsAuthenticated(true);
-
           LocalStorage.set("token", accessToken);
-
           LocalStorage.set("user", user);
-
           navigate("/");
+          // (response: { user: User; accessToken: string }) => {
+          //   const { user, accessToken } = response;
+          //   setCurrentUser(user);
+          //   setIsAuthenticated(true);
+          //   LocalStorage.set("token", accessToken);
+          //   LocalStorage.set("user", user);
+          //   navigate("/");
         },
         setError
       );
@@ -96,9 +100,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 
   const register = useCallback(
-    async (userData: FormData) => {
+    async (userData: RegisterData) => {
       await requestHandler(
         () => userService.registerUser(userData),
+        setLoading,
+        (response) => {
+          // console.log(response);
+          // console.log(response.data);
+          const newUser = response.data;
+          navigate("/auth/profile-setup", { state: { userId: newUser._id } });
+          console.log("here");
+        },
+        setError
+      );
+    },
+    [navigate]
+  );
+
+  const completeProfileSetup = useCallback(
+    async (userId: string, imageData: FormData) => {
+      await requestHandler(
+        () => userService.updateProfileImages(userId, imageData),
         setLoading,
         () => {
           navigate("/auth/login");
@@ -130,7 +152,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       () => userService.refreshAccessToken(),
       setLoading,
       (response) => {
-        const { data } = response;
+        const { data } = response.data;
         LocalStorage.set("token", data.accessToken);
         fetchCurrentUser();
       },
@@ -234,6 +256,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isAuthReady,
     login,
     register,
+    completeProfileSetup,
     logout,
     refreshAuthToken,
     changePassword,

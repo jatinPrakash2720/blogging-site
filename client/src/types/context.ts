@@ -18,7 +18,8 @@ import type {
   UpdateSaveCollectionPayload,
   Comment,
   ForgotPasswordPayload,
-  ResetPasswordPayload
+  ResetPasswordPayload,
+  RegisterData
 
 } from "../types/api.ts";
 import type { ReactNode } from "react";
@@ -30,7 +31,8 @@ export interface IAuthContext {
   error: string | null;
   isAuthReady: boolean;
   login: (credentials: LoginCredentials) => Promise<void>;
-  register: (userData: FormData) => Promise<void>;
+  register: (userData: RegisterData) => Promise<void>;
+  completeProfileSetup: (userId: string, imageData: FormData) => Promise<void>;
   logout: () => Promise<void>;
   refreshAuthToken: () => Promise<void>;
   changePassword: (passwordData: ChangePasswordData) => Promise<void>;

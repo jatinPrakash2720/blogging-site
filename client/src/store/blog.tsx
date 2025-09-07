@@ -54,30 +54,30 @@ export const BlogProvider: React.FC<contextInterfaces.BlogProviderProps> = ({
     []
   );
 
-   const fetchAllBlogs = useCallback(
-     async (params: apiInterfaces.GetBlogsParams = {}) => {
-       await requestHandler(
-         () => blogService.getBlogs(params),
-         setLoading,
-         (response) => {
-           const { data } = response;
-           // CORRECTED: The `paginatedData` is the direct response,
-           // which contains the `blogs` array.
-           setAllBlogs(data.blogs);
-           updatePaginationState(data, setPagination);
-         },
-         setError
-       );
-     },
-     [updatePaginationState]
-   );
+  const fetchAllBlogs = useCallback(
+    async (params: apiInterfaces.GetBlogsParams = {}) => {
+      await requestHandler(
+        () => blogService.getBlogs(params),
+        setLoading,
+        (response) => {
+          const { data } = response.data;
+          // CORRECTED: The `paginatedData` is the direct response,
+          // which contains the `blogs` array.
+          setAllBlogs(data.blogs);
+          updatePaginationState(data, setPagination);
+        },
+        setError
+      );
+    },
+    [updatePaginationState]
+  );
 
   const fetchSingleBlog = useCallback(async (blogId: string) => {
     await requestHandler(
       () => blogService.getBlog(blogId),
       setLoadingSingleBlog,
       (response) => {
-        const { data } = response;
+        const { data } = response.data;
         setCurrentBlog(data);
       },
       setError
@@ -91,7 +91,7 @@ export const BlogProvider: React.FC<contextInterfaces.BlogProviderProps> = ({
         () => blogService.createBlog(blogData),
         setLoading,
         (response) => {
-          const { data } = response;
+          const { data } = response.data;
           setAllBlogs((prev) => [data, ...prev]);
           setUserBlogs((prev) => [data, ...prev]);
           createdBlog = data;
@@ -110,7 +110,7 @@ export const BlogProvider: React.FC<contextInterfaces.BlogProviderProps> = ({
         () => blogService.updateBlogDetails(payload),
         setLoading,
         (response) => {
-          const { data: updatedBlog } = response;
+          const { data: updatedBlog } = response.data;
           const updater = (blog: Blog) =>
             blog._id === updatedBlog._id ? updatedBlog : blog;
 
@@ -196,7 +196,7 @@ export const BlogProvider: React.FC<contextInterfaces.BlogProviderProps> = ({
         () => blogService.UpdateBlogThumbnail(payload),
         setLoading,
         (response) => {
-          const { data } = response;
+          const { data } = response.data;
           const updater = (blog: apiInterfaces.Blog) =>
             blog._id === payload.blogId
               ? { ...blog, thumbnail: data.thumbnail }
@@ -221,7 +221,7 @@ export const BlogProvider: React.FC<contextInterfaces.BlogProviderProps> = ({
       () => blogService.toggleBlogStatus(blogId),
       setLoading,
       (response) => {
-        const data = response.data;
+        const { data } = response.data;
         const updater = (blog: apiInterfaces.Blog): apiInterfaces.Blog =>
           blog._id === blogId
             ? {
@@ -323,9 +323,9 @@ export const BlogProvider: React.FC<contextInterfaces.BlogProviderProps> = ({
         () => blogService.getFollowingFeed(params),
         setLoading,
         (response) => {
-          // const { data } = response;
-          setFeedBlogs(response.blogs);
-          updatePaginationState(response, setFeedPagination);
+          const { data } = response;
+          setFeedBlogs(data.blogs);
+          updatePaginationState(data, setFeedPagination);
         },
         setError
       );

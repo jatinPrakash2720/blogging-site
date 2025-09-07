@@ -3,7 +3,7 @@ export interface User {
   username: string;
   fullName: string;
   email: string;
-  avatar: string;
+  avatar?: string;
   coverImage?: string;
   bio?: string;
   createdAt: string;
@@ -58,6 +58,12 @@ export interface LoginCredentials {
   email?: string;
   username?: string;
   password?: string;
+}
+export interface RegisterData {
+  username: string;
+  fullName: string;
+  email: string;
+  password: string;
 }
 
 export interface ChangePasswordData {

@@ -2,11 +2,15 @@ import { apiClient } from "../lib/apiConfig.ts";
 import type * as apiInterfaces from "../types/api.ts";
 import type { ApiResponse } from "../types/apiResponse.ts";
 
-export const registerUser = (data: FormData) => {
-  return apiClient.post<ApiResponse<{ data: apiInterfaces.User }>>(
+export const registerUser = (data: apiInterfaces.RegisterData) => {
+  return apiClient.post<ApiResponse<apiInterfaces.User>>(
     "/users/register",
     data
   );
+};
+
+export const updateProfileImages = (userId: string, imageData: FormData) => {
+  return apiClient.patch(`/users/${userId}/profile-images`, imageData);
 };
 
 export const loginUser = (data: apiInterfaces.LoginCredentials) => {
@@ -32,9 +36,7 @@ export const changeCurrentPassword = (
 };
 
 export const getCurrentUser = () => {
-  return apiClient.get<ApiResponse<{ data: apiInterfaces.User }>>(
-    "/users/current-user"
-  );
+  return apiClient.get<ApiResponse<apiInterfaces.User>>("/users/current-user");
 };
 
 export const updateUserFullName = (data: { fullName: string }) => {
@@ -54,34 +56,37 @@ export const updateUserCoverImage = (coverImageFormData: FormData) => {
 };
 
 export const getUserPageProfile = (username: string) => {
-  return apiClient.get<ApiResponse<{ data: apiInterfaces.User }>>(
-    `/users/c/${username}`
-  );
+  return apiClient.get<ApiResponse<apiInterfaces.User>>(`/users/c/${username}`);
 };
 
 export const getReadHistory = (params: apiInterfaces.PaginationParams = {}) => {
-  return apiClient.get<
-    ApiResponse<{ data: apiInterfaces.PaginatedBlogResponse }>
-  >("/users/history", {
-    params,
-  });
+  return apiClient.get<ApiResponse<apiInterfaces.PaginatedBlogResponse>>(
+    "/users/history",
+    {
+      params,
+    }
+  );
 };
 
 export const getUserBlogs = ({
   userId,
   ...params
 }: apiInterfaces.GetUserBlogsParams) => {
-  return apiClient.get<
-    ApiResponse<{ data: apiInterfaces.PaginatedBlogResponse }>
-  >(`/users/${userId}/blogs`, {
-    params,
-  });
+  return apiClient.get<ApiResponse<apiInterfaces.PaginatedBlogResponse>>(
+    `/users/${userId}/blogs`,
+    {
+      params,
+    }
+  );
 };
 
 export const forgotPassword = (data: apiInterfaces.ForgotPasswordPayload) => {
   return apiClient.post("/users/forgot-password", data);
-}
+};
 
-export const restorePassword = (token: string, data: apiInterfaces.ResetPasswordPayload) => {
+export const restorePassword = (
+  token: string,
+  data: apiInterfaces.ResetPasswordPayload
+) => {
   return apiClient.post(`/users/restore-password/${token}`, data);
-}
+};

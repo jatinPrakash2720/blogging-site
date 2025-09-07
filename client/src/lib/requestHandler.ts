@@ -6,7 +6,7 @@ import type { AxiosErrorResponse } from "../types/apiError.ts";
 export const requestHandler = async <T>(
   api: () => Promise<AxiosResponse<ApiResponse<T>>>,
   setLoading: ((loading: boolean) => void) | null,
-  onSuccess: (data: T) => void, // Now returns the inner 'data' directly
+  onSuccess: (data: ApiResponse<T>) => void, // Now returns the inner 'data' directly
   onError: (error: string) => void
 ) => {
   setLoading?.(true);
@@ -14,7 +14,7 @@ export const requestHandler = async <T>(
     const response = await api();
     const { data } = response;
     if (data?.success) {
-      onSuccess(data.data); // Pass the nested data directly to the success callback
+      onSuccess(data); // Pass the nested data directly to the success callback
     }
   } catch (error: unknown) {
     const axiosError = error as AxiosErrorResponse;

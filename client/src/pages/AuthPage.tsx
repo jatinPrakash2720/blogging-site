@@ -11,6 +11,7 @@ import { RestorePassword } from "@/components/features/auth/RestorePassword";
 import { useAuth } from "@/store/auth";
 import AuthLayout from "@/components/layout/AuthLayout";
 import type { Testimonial } from "@/types/components/features/auth";
+import type { RegisterData } from "@/types/api";
 
 export type AuthMode =
   | "login"
@@ -28,7 +29,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ mode }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { token } = useParams<{ token: string }>();
-  const { login, register, forgotPassword, restorePassword, clearAuthError } =
+  const { login, register, completeProfileSetup, forgotPassword, restorePassword, clearAuthError } =
     useAuth();
 
   // Sample testimonials for register page
@@ -66,55 +67,71 @@ const AuthPage: React.FC<AuthPageProps> = ({ mode }) => {
   };
 
   // Register handlers
-  const handleSignUp = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSignUp = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const registrationData = Object.fromEntries(formData.entries());
-    console.log("Collected registration data, navigating to profile setup...");
-    navigate("/auth/profile-setup", { state: { registrationData } });
+
+    const username = formData.get("username") as string;
+    const fullName = formData.get("fullName") as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
+
+    if (!username || !fullName || !email || !password) {
+      console.error("All fields are required.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      console.error("Passwords do not match.");
+      return;
+    }
+
+    const registrationData: RegisterData = {
+      username:username,
+      fullName:fullName,
+      email:email,
+      password:password
+    }
+
+    await register(registrationData);
+
+    // navigate("/auth/profile-setup", { state: { registrationData } });
   };
 
   // Profile setup handlers
-  const registrationData = location.state?.registrationData;
+  const userIdForProfileSetup = location.state?.userId;
+  console.log(userIdForProfileSetup);
 
   React.useEffect(() => {
-    if (mode === "profile-setup" && !registrationData) {
+    if (mode === "profile-setup" && !userIdForProfileSetup) {
       console.error(
-        "No registration data found, redirecting to register page."
+        "No user Id found for profile setup. Redirecting to register page."
       );
       navigate("/auth/register");
     }
-  }, [mode, registrationData, navigate]);
+  }, [mode, userIdForProfileSetup, navigate]);
 
   const handleProfileComplete = async (profileData: {
     avatar?: File;
     coverImage?: File;
   }) => {
-    const finalFormData = new FormData();
-
-    for (const key in registrationData) {
-      finalFormData.append(key, registrationData[key]);
-    }
+    const imageData = new FormData();
 
     if (profileData.avatar) {
-      finalFormData.append("avatar", profileData.avatar);
+      imageData.append("avatar", profileData.avatar);
     }
 
     if (profileData.coverImage) {
-      finalFormData.append("coverImage", profileData.coverImage);
+      imageData.append("coverImage", profileData.coverImage);
     }
 
-    console.log("Sending complete registration data to the backend...");
-    await register(finalFormData);
+    await completeProfileSetup(userIdForProfileSetup, imageData);
   };
 
   const handleProfileSkip = async () => {
     console.log("Skipping profile setup, sending only registration data...");
-    const finalFormData = new FormData();
-    for (const key in registrationData) {
-      finalFormData.append(key, registrationData[key]);
-    }
-    await register(finalFormData);
+    navigate("/auth/login");
   };
 
   // Forgot password handlers

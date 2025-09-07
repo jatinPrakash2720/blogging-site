@@ -7,7 +7,7 @@ export const getBlogComments = (
   params: apiInterfaces.PaginationParams = {}
 ) => {
   return apiClient.get<
-    ApiResponse<{ data: apiInterfaces.PaginatedCommentResponse }>
+    ApiResponse<apiInterfaces.PaginatedCommentResponse>
   >(`/comments/${blogId}`, { params });
 };
 

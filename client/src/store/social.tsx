@@ -43,7 +43,8 @@ export const SocialProvider: React.FC<
       () => commentService.getBlogComments(blogId),
       setLoading,
       (response) => {
-        setComments(response.data.docs || []);
+        const { data } = response;
+        setComments(data.docs || []);
       },
       setError
     );
@@ -54,8 +55,8 @@ export const SocialProvider: React.FC<
     await requestHandler(
       () => commentService.addCommentToBlog(blogId, { content }),
       setLoading,
-      (response: apiInterfaces.Comment) => {
-        setComments((prev) => [response, ...prev]);
+      (response) => {
+        setComments((prev) => [response.data, ...prev]);
         success = true;
       },
       setError
@@ -83,7 +84,7 @@ export const SocialProvider: React.FC<
     await requestHandler(
       () => likeService.toggleBlogLike(blogId),
       null,
-      (res) => (likedStatus = res.data.liked),
+      (response) => (likedStatus = response.data.liked),
       setError
     );
     return likedStatus;
@@ -94,7 +95,7 @@ export const SocialProvider: React.FC<
     await requestHandler(
       () => likeService.toggleCommentLike(commentId),
       null,
-      (res) => (likedStatus = res.data.liked),
+      (response) => (likedStatus = response.data.liked),
       setError
     );
     return likedStatus;

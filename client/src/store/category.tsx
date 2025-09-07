@@ -27,7 +27,7 @@ export const CategoryProvider: React.FC<contextInterfaces.CategoryProviderProps>
             () => categoryService.getTopLevelCategories(),
             setLoading,
             (response) => {
-                setTopLevelCategories(response.data);
+                setTopLevelCategories(response.data.data);
             },
             setError
         );
@@ -38,7 +38,7 @@ export const CategoryProvider: React.FC<contextInterfaces.CategoryProviderProps>
             () => categoryService.getSubCategories(parentId),
             setLoading,
             (response) => {
-                setSubCategories(response.data);
+                setSubCategories(response.data.data);
             },
             setError
         );
@@ -50,7 +50,7 @@ export const CategoryProvider: React.FC<contextInterfaces.CategoryProviderProps>
             () => categoryService.getFilterableSubCategories(parentId, threshold),
             setLoading,
             (response) => {
-                setFilterableSubCategories(response.data);
+                setFilterableSubCategories(response.data.data);
             },
             setError
         );
@@ -63,7 +63,7 @@ export const CategoryProvider: React.FC<contextInterfaces.CategoryProviderProps>
             () => categoryService.createSubCategory(parentId, data),
             setLoading,
             (response) => {
-                setSubCategories((prev) => [...prev, response.data]);
+                setSubCategories((prev) => [...prev, response.data.data]);
                 success = true;
             },
             setError

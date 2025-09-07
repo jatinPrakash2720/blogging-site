@@ -3,13 +3,13 @@ import type {User, Blog, LikeToggleResponse } from "../types/api.ts";
 import type { ApiResponse } from "../types/apiResponse.ts";
 
 export const toggleBlogLike = (blogId: string) => {
-  return apiClient.post<ApiResponse<{ data: LikeToggleResponse }>>(
+  return apiClient.post<ApiResponse<LikeToggleResponse>>(
     `/likes/toggle/blog/${blogId}`
   );
 };
 
 export const toggleCommentLike = (commentId: string) => {
-  return apiClient.post<ApiResponse<{ data: LikeToggleResponse }>>(
+  return apiClient.post<ApiResponse<LikeToggleResponse>>(
     `/likes/toggle/comment/${commentId}`
   );
 };
@@ -19,9 +19,9 @@ export const getBlogsLikedByUser = () => {
 };
 
 export const getBlogLikes = (blogId: string) => {
-    return apiClient.get<ApiResponse<{ data: User[] }>>(`/likes/blog/${blogId}`);
+    return apiClient.get<ApiResponse<User[]>>(`/likes/blog/${blogId}`);
 }
 
 export const getCommentLikes = (commentId: string) => {
-    return apiClient.get<ApiResponse<{ data: User[] }>>(`/likes/comment/${commentId}`);
+    return apiClient.get<ApiResponse<User[] >>(`/likes/comment/${commentId}`);
 }
