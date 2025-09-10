@@ -22,6 +22,7 @@ const toggleBlogLike = asyncHandler(async (req, res) => {
 
   if (existingLike) {
     await Like.findByIdAndDelete(existingLike._id);
+    await Blog.findByIdAndUpdate(blogId, { $inc: { likeCount: -1 } });
     return res
       .status(200)
       .json(
@@ -29,6 +30,7 @@ const toggleBlogLike = asyncHandler(async (req, res) => {
       );
   } else {
     await Like.create(likeCriteria);
+    await Blog.findByIdAndUpdate(blogId, { $inc: { likeCount: 1 } });
     return res
       .status(200)
       .json(new ApiResponse(200, { liked: true }, "Blog liked successfully."));

@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 import { asyncHandler } from "../utils/asyncHandler.util.js";
 import { ApiResponse } from "../utils/ApiResponse.util.js";
 import { ApiError } from "../utils/ApiError.util.js";
@@ -12,81 +14,114 @@ import { Category } from "../models/category.model.js";
 import { generateExcerpt, generateSlug } from "../utils/genSlugAndExcerpt.utils.js";
 
 const getBlogs = asyncHandler(async (req, res) => {
-  const page = parseInt(req.query.page, 10) || 1;
-  const limit = parseInt(req.query.limit, 10) || 10;
-  const sortBy = req.query.sortBy || "createdAt";
-  const sortOrder = req.query.sortOrder === "asc" ? 1 : -1;
-  const searchQuery = req.query.q;
-  const pipeline = [];
-
-  pipeline.push({
-    $match: {
-      isPublished: true,
-      // NEW: Ensure only non-deleted blogs are fetched for the public list
-      deleted: { $ne: true },
-    },
-  });
-  if (searchQuery) {
+try {
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
+    const sortBy = req.query.sortBy || "createdAt";
+    const sortOrder = req.query.sortOrder === "asc" ? 1 : -1;
+    const searchQuery = req.query.q;
+    const currentUserId = req.user?._id
+      ? new mongoose.Types.ObjectId(req.user._id)
+      : null;
+    const pipeline = [];
+  
     pipeline.push({
       $match: {
-        title: {
-          $regex: searchQuery,
-          $options: "i",
-        },
+        isPublished: true,
+        // NEW: Ensure only non-deleted blogs are fetched for the public list
+        deleted: { $ne: true },
       },
     });
-  }
-  pipeline.push({
-    $lookup: {
-      from: "users",
-      localField: "owner",
-      foreignField: "_id",
-      as: "owner",
-    },
-  });
-  pipeline.push({
-    $unwind: {
-      path: "$owner",
-      preserveNullAndEmptyArrays: true,
-    },
-  });
-  pipeline.push({
-    $project: {
-      title: 1,
-      thumbnail: 1,
-      slug: 1,
-      views: 1,
-      isPublished: 1,
-      createdAt: 1,
-      updatedAt: 1,
-      owner: {
-        _id: "$owner._id",
-        username: "$owner.username",
-        fullName: "$owner.fullName",
-        avatar: "$owner.avatar",
+    if (searchQuery) {
+      pipeline.push({
+        $match: {
+          title: {
+            $regex: searchQuery,
+            $options: "i",
+          },
+        },
+      });
+    }
+    pipeline.push({
+      $lookup: {
+        from: "users",
+        localField: "owner",
+        foreignField: "_id",
+        as: "owner",
       },
-      // Optional: Truncate content for list view
-      content: { $substrCP: ["$content", 0, 200] },
-    },
-  });
-
-  const sortStage = {};
-  sortStage[sortBy] = sortOrder;
-  pipeline.push({
-    $sort: sortStage,
-  });
-
-  const blogs = await Blog.aggregatePaginate(Blog.aggregate(pipeline), {
-    page: page,
-    limit: limit,
-    customLabels: {
-      docs: "blogs", // Corrected: 'blogs' must be a string literal
-    },
-  });
-
-  return res
-    .status(200)
-    .json(new ApiResponse(200, blogs, "Published blogs fetched successfully"));
+    });
+    pipeline.push({
+      $unwind: {
+        path: "$owner",
+        preserveNullAndEmptyArrays: true,
+      },
+    });
+    if (currentUserId) {
+      pipeline.push({
+        $lookup: {
+          from: "likes",
+          let: { blog_id: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {
+                      $eq: ["$blog", "$$blog_id"]
+                    },
+                    {
+                      $eq: ["$likedBy", currentUserId]
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          as: "userLike",
+        },
+      });
+    }
+    pipeline.push({
+      $project: {
+        title: 1,
+        thumbnail: 1,
+        slug: 1,
+        excerpt:1,
+        views: 1,
+        createdAt: 1,
+        likeCount: 1,
+        commentCount: 1,
+        isLiked: currentUserId ? {$gt:[{$size:"$userLike"}, 0]}:false,
+        owner: {
+          _id: "$owner._id",
+          username: "$owner.username",
+          fullName: "$owner.fullName",
+          avatar: "$owner.avatar",
+        },
+        // Optional: Truncate content for list view
+      },
+    });
+  
+    const sortStage = {[sortBy]:sortOrder};
+    pipeline.push({
+      $sort: sortStage,
+    });
+    
+  
+    const blogs = await Blog.aggregatePaginate(Blog.aggregate(pipeline), {
+      page: page,
+      limit: limit,
+      customLabels: {
+        docs: "blogs", // Corrected: 'blogs' must be a string literal
+      },
+    });
+  
+    return res
+      .status(200)
+      .json(new ApiResponse(200, blogs, "Published blogs fetched successfully"));
+} catch (error) {
+  throw new ApiError(501, `Internal Error from Here Bro : ${error.message ? error.message: ""}`);
+}
 });
 
 const getBlog = asyncHandler(async (req, res) => {

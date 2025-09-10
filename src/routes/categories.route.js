@@ -13,8 +13,11 @@ router.use(verifyJWT);
 router.route("/top-level").get(getTopLevelCategories);
 router.route("/:parentId/sub-categories").get(getSubCategories);
 router
-  .route("/:parentId/filterable-subcategories")
+  .route("/filterable-subcategories")
   .get(getFilterableSubCategories);
+// router
+//   .route("/:parentId/filterable-subcategories")
+//   .get(getFilterableSubCategories);
 router.route("/:parentId/sub-categories").post(createSubCategory);
 
 export default router;

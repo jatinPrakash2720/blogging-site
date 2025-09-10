@@ -1749,7 +1749,9 @@ const seedDatabase = async () => {
           status: "published",
           isPublished: true,
             owner: user._id,
-          categories:category?[category._id]:[],
+          categories: category ? [category._id] : [],
+          likeCount: 4,
+          commentCount:4,
         });
       }
     }

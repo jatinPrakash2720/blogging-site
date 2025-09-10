@@ -14,7 +14,7 @@ const blogSchema = new Schema(
       type: String,
       required: true,
       trim: true,
-      index:true
+      index: true,
     },
     excerpt: {
       type: String,
@@ -39,7 +39,7 @@ const blogSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ["draft", "published", "archived"],
+      enum: ["draft", "published", "archived", "pending"],
       default: "draft",
     },
     owner: {
@@ -53,6 +53,14 @@ const blogSchema = new Schema(
         ref: "Category",
       },
     ],
+    likeCount: {
+      type: Number,
+      default: 0,
+    },
+    commentCount: {
+      type: Number,
+      default: 0,
+    },
     // isDeleted: {
     //   type: Boolean,
     //   default: false,

@@ -95,6 +95,7 @@ const addCommentToBlogs = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Failed to create comment.");
   }
 
+  await Blog.findByIdAndUpdate(blogId, { $inc: { commentCount: 1 } });
   return res
     .status(201)
     .json(new ApiResponse(201, comment, "Comment added successfully."));
@@ -126,7 +127,9 @@ const deleteComment = asyncHandler(async (req, res) => {
   if (!isCommentOwner && !isBlogOwner) {
     throw new ApiError(403, "You are not authorized to delete this comment.");
   }
-  await Comment.deleteById(commentId);
+  await Blog.findByIdAndUpdate(comment.blog, { $inc: { commentCount: -1 } });
+  
+  await Comment.findByIdAndDelete(commentId);
 
   return res
     .status(200)

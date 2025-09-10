@@ -122,25 +122,47 @@ const getSubCategories = asyncHandler(async (req, res) => {
 });
 
 const getFilterableSubCategories = asyncHandler(async (req, res) => {
-  const { parentId } = req.params;
-  // const threshold = 5;
-  const threshold = parseInt(req.query.threshold, 10) || 5;
+  // const { parentId } = req.params;
+  // // const threshold = 5;
+  // const threshold = parseInt(req.query.threshold, 10) || 5;
 
-  if (!mongoose.isValidObjectId(parentId)) {
-    throw new ApiError(400, "Invalid parent ID.");
-  }
+  // if (!mongoose.isValidObjectId(parentId)) {
+  //   throw new ApiError(400, "Invalid parent ID.");
+  // }
 
-  const filterableCategories = await Category.find({
-    parent: parentId,
-    blogCount: { $gte: threshold },
-  });
+  // const filterableCategories = await Category.find({
+  //   parent: parentId,
+  //   blogCount: { $gte: threshold },
+  // });
+
+  const mainCategories = [
+    {
+      // Using new mongoose.Types.ObjectId() to simulate a real database ID
+      _id: new mongoose.Types.ObjectId(),
+      slug: "technology",
+      name: "Technology",
+      type: "pre-defined",
+    },
+    {
+      _id: new mongoose.Types.ObjectId(),
+      slug: "design",
+      name: "Design",
+      type: "pre-defined",
+    },
+    {
+      _id: new mongoose.Types.ObjectId(),
+      slug: "productivity",
+      name: "Productivity",
+      type: "pre-defined",
+    },
+  ];
 
   return res
     .status(200)
     .json(
       new ApiResponse(
         200,
-        filterableCategories,
+        mainCategories,
         "filterable sub-categories fetched successfully."
       )
     );
