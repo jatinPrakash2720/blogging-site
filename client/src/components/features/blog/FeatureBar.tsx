@@ -1,6 +1,7 @@
 "use client";
 
-import type React from "react";
+// import type React from "react";
+import React from "react";
 import { cn } from "@/lib/utils";
 import { LayoutToggle, type LayoutType } from "../../common/subComps/layout-toggle";
 
@@ -16,7 +17,8 @@ interface FeatureBarProps {
   setActiveFilter: (filter: string) => void;
   layout?: LayoutType;
   onLayoutChange?: (layout: LayoutType) => void;
-  
+  sortBy?: string;
+  onSortChange?: (sort: string) => void;
 }
 
 const FeatureBar: React.FC<FeatureBarProps> = ({
@@ -25,7 +27,13 @@ const FeatureBar: React.FC<FeatureBarProps> = ({
   setActiveFilter,
   layout = "square",
   onLayoutChange,
+  sortBy = "Newest",
+  onSortChange,
 }) => {
+  
+  
+  const sortOptions = ["Newest", "Popular", "Trending"];
+
   return (
     <>
       {/* Desktop FeatureBar */}
@@ -52,14 +60,47 @@ const FeatureBar: React.FC<FeatureBarProps> = ({
           })}
         </div>
 
-        {/* Layout toggle */}
-        {onLayoutChange && (
-          <LayoutToggle
-            layout={layout}
-            onLayoutChange={onLayoutChange}
-            className="ml-4 flex-shrink-0"
-          />
-        )}
+        {/* Sort Dropdown and Layout toggle container */}
+        <div className="flex items-center gap-4">
+          {/* Sort Dropdown */}
+          {onSortChange && (
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-muted-foreground">Sort by:</span>
+              <button
+                onClick={() => {
+                  const currentIndex = sortOptions.indexOf(sortBy);
+                  const nextIndex = (currentIndex + 1) % sortOptions.length;
+                  onSortChange(sortOptions[nextIndex]);
+                }}
+                className="flex items-center space-x-2 px-3 py-1.5 text-sm font-medium bg-muted/50 hover:bg-muted rounded-lg transition-colors"
+              >
+                <span>{sortBy}</span>
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+            </div>
+          )}
+
+          {/* Layout toggle */}
+          {onLayoutChange && (
+            <LayoutToggle
+              layout={layout}
+              onLayoutChange={onLayoutChange}
+              className="flex-shrink-0"
+            />
+          )}
+        </div>
       </div>
 
       {/* Mobile Menubar */}

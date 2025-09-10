@@ -23,6 +23,7 @@ export const BlogProvider: React.FC<contextInterfaces.BlogProviderProps> = ({
   children,
 }) => {
   const [allBlogs, setAllBlogs] = useState<Blog[]>([]);
+  const [trendingBlogs, setTrendingBlogs] = useState<Blog[]>([]);
   const [currentBlog, setCurrentBlog] = useState<Blog | null>(null);
   const [userBlogs, setUserBlogs] = useState<Blog[]>([]);
   const [readHistory, setReadHistory] = useState<Blog[]>([]);
@@ -56,15 +57,19 @@ export const BlogProvider: React.FC<contextInterfaces.BlogProviderProps> = ({
 
   const fetchAllBlogs = useCallback(
     async (params: apiInterfaces.GetBlogsParams = {}) => {
+      console.log("hi");
       await requestHandler(
         () => blogService.getBlogs(params),
         setLoading,
         (response) => {
-          const { data } = response.data;
-          // CORRECTED: The `paginatedData` is the direct response,
-          // which contains the `blogs` array.
-          setAllBlogs(data.blogs);
-          updatePaginationState(data, setPagination);
+          const {blogs} = response.data;
+          // if (data && data.blogs) {
+          setAllBlogs(blogs);
+          setTrendingBlogs(blogs.slice(0, 5));
+            updatePaginationState(response.data, setPagination);
+          // } else {
+          //   console.error("No blogs found in response:", data);
+          // }
         },
         setError
       );
@@ -332,10 +337,29 @@ export const BlogProvider: React.FC<contextInterfaces.BlogProviderProps> = ({
     },
     [updatePaginationState]
   );
+  const fetchBlogsByCategory = useCallback(
+    async (categoryId: string, params: apiInterfaces.GetBlogsParams = {}) => {
+      await requestHandler(
+        () => blogService.getBlogsByTopLevelCategory(categoryId, params),
+        setLoading,
+        (response) => {
+        if (params.page && params.page > 1) {
+          setAllBlogs((prev) => [...prev, ...response.data.blogs]);
+        } else {
+          setAllBlogs(response.data.blogs);
+        }
+        setPagination(response.data);
+      },
+        setError
+      );
+    },
+    []
+  );
 
   const contextValue: contextInterfaces.IBlogContext = {
     allBlogs,
     currentBlog,
+    trendingBlogs,
     userBlogs,
     readHistory,
     loading,
@@ -346,7 +370,7 @@ export const BlogProvider: React.FC<contextInterfaces.BlogProviderProps> = ({
     readHistoryPagination,
     feedBlogs,
     feedPagination,
-    // fetchAllBlogs,
+    fetchAllBlogs,
     fetchSingleBlog,
     initiateBlogCreation,
     updateBlogDetailsAction,
@@ -358,8 +382,8 @@ export const BlogProvider: React.FC<contextInterfaces.BlogProviderProps> = ({
     toggleBlogStatusAction,
     deleteBlogAction,
     restoreBlogAction,
-
     fetchFollowingFeed,
+    fetchBlogsByCategory
   };
 
   return (

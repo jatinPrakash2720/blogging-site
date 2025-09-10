@@ -4,7 +4,7 @@ import type { ApiResponse } from "../types/apiResponse.ts";
 
 export const getBlogs = (params: apiInterfaces.GetBlogsParams = {}) => {
   return apiClient.get<
-    ApiResponse<{ data: apiInterfaces.PaginatedBlogResponse }>
+    ApiResponse<apiInterfaces.PaginatedBlogResponse >
   >("/blogs", { params });
 };
 
@@ -75,7 +75,7 @@ export const getBlogsByTopLevelCategory = (
   params: apiInterfaces.GetBlogsParams = {}
 ) => {
   return apiClient.get<
-    ApiResponse<{ data: apiInterfaces.PaginatedBlogResponse }>
+    ApiResponse<apiInterfaces.PaginatedBlogResponse >
   >(`/blogs/by-category/${categoryId}`, { params });
 };
 

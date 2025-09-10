@@ -1,4 +1,3 @@
-import * as React from "react";
 // 1. Import all the Pagination components from the raw Shadcn UI file
 import {
   Pagination as ShadcnPagination,
@@ -11,6 +10,7 @@ import {
 } from "@/components/ui/pagination";
 
 // 2. Re-export all the components for use in your application.
+// This creates a "pass-through" wrapper, which is great for future customization.
 const Pagination = ShadcnPagination;
 const PaginationContent = ShadcnPaginationContent;
 const PaginationEllipsis = ShadcnPaginationEllipsis;

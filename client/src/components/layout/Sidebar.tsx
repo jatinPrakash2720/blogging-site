@@ -5,7 +5,7 @@ import Footer from "./Footer";
 
 const Sidebar: React.FC = () => {
   return (
-    <aside className="sticky top-40 space-y-8">
+    <aside className="sticky top-40 space-y-3.5">
       <Trending />
       <FollowSuggestions />
       {/* 2. Add the new component here */}

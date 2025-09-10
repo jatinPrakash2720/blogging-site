@@ -31,9 +31,9 @@ const mockUsersToFollow = [
 
 const FollowSuggestions: React.FC = () => {
   return (
-    <Card className=" sticky top-50">
+    <Card className="bg-white/50 dark:bg-neutral-900/50 backdrop-blur-xl border dark:border-neutral-800 border-black/10 rounded-2xl shadow-lg">
       <CardHeader>
-        <CardTitle className="text-lg">Who to follow</CardTitle>
+        <CardTitle className="text-lg text-foreground">Who to follow</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {mockUsersToFollow.map((user) => (

@@ -13,16 +13,27 @@ export const getSubCategories = (parentId: string) => {
     `/categories/${parentId}/sub-categories`
   );
 };
+interface mainCategory {
+  _id: string; // Use string on the frontend
+  slug: string;
+  name: string;
+  type: "pre-defined";
+}
 
-export const getFilterableSubCategories = (
-  parentId: string,
-  threshold: number = 5
-) => {
-  return apiClient.get<ApiResponse<{ data: Category[] }>>(
-    `/categories/${parentId}/filterable-subcategories`,
-    { params: { threshold } }
-  );
+export const getFilterableSubCategories = () => {
+  return apiClient.get<
+    ApiResponse<mainCategory[]>
+  >(`/categories/filterable-subcategories`);
 };
+// export const getFilterableSubCategories = (
+//   parentId: string,
+//   threshold: number = 5
+// ) => {
+//   return apiClient.get<ApiResponse<{ data: Category[] }>>(
+//     `/categories/${parentId}/filterable-subcategories`,
+//     { params: { threshold } }
+//   );
+// };
 
 export const createSubCategory = (
   parentId: string,

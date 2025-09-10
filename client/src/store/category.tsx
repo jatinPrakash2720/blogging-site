@@ -6,6 +6,12 @@ import { requestHandler } from "../lib";
 
 const CategoryContext = createContext<contextInterfaces.ICategoryContext | undefined>(undefined);
 
+interface mainCategory {
+  _id: string; // Use string on the frontend
+  slug: string;
+  name: string;
+  type: "pre-defined";
+}
 export const useCategories = () => {
     const context = useContext(CategoryContext);
     if (!context) {
@@ -20,7 +26,7 @@ export const CategoryProvider: React.FC<contextInterfaces.CategoryProviderProps>
 
       const [topLevelCategories, setTopLevelCategories] = useState<apiInterfaces.Category[]>([]);
       const [subCategories, setSubCategories] = useState<apiInterfaces.Category[]>([]);
-      const [filterableSubCategories, setFilterableSubCategories] = useState<apiInterfaces.Category[]>([]);
+      const [filterableSubCategories, setFilterableSubCategories] = useState<mainCategory[]>([]);
 
     const fetchTopLevelCategories = useCallback(async () => {
         await requestHandler(
@@ -45,16 +51,26 @@ export const CategoryProvider: React.FC<contextInterfaces.CategoryProviderProps>
 
     }, []);
 
-    const fetchFilterableSubCategories = useCallback(async (parentId: string, threshold: number = 5) => {
+    const fetchFilterableSubCategories = useCallback(async () => {
         await requestHandler(
-            () => categoryService.getFilterableSubCategories(parentId, threshold),
+            () => categoryService.getFilterableSubCategories(),
             setLoading,
             (response) => {
-                setFilterableSubCategories(response.data.data);
+                setFilterableSubCategories(response.data);
             },
             setError
         );
     }, []);
+    // const fetchFilterableSubCategories = useCallback(async (parentId: string, threshold: number = 5) => {
+    //     await requestHandler(
+    //         () => categoryService.getFilterableSubCategories(parentId, threshold),
+    //         setLoading,
+    //         (response) => {
+    //             setFilterableSubCategories(response.data.data);
+    //         },
+    //         setError
+    //     );
+    // }, []);
 
     const createSubCategory = useCallback(async (parentId: string, data: apiInterfaces.CreateSubCategoryPayload) => {
         

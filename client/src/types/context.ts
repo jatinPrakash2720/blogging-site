@@ -55,6 +55,7 @@ export interface IBlogContext {
   allBlogs: Blog[];
   currentBlog: Blog | null;
   userBlogs: Blog[];
+  trendingBlogs: Blog[];
   readHistory: Blog[];
   loading: boolean;
   loadingSingleBlog: boolean;
@@ -64,8 +65,12 @@ export interface IBlogContext {
   readHistoryPagination: PaginatedBlogResponse | null;
   feedBlogs: Blog[];
   feedPagination: PaginatedBlogResponse | null;
-  // fetchAllBlogs: (params?: GetBlogsParams) => Promise<void>;
+  fetchAllBlogs: (params?: GetBlogsParams) => Promise<void>;
   fetchSingleBlog: (blogId: string) => Promise<void>;
+  fetchBlogsByCategory: (
+    categoryId: string,
+    params?: GetBlogsParams
+  ) => Promise<void>;
   initiateBlogCreation: (data: {
     title: string;
     content: object;
@@ -93,18 +98,28 @@ export interface BlogProviderProps {
   children: ReactNode;
 }
 
+
+interface mainCategory {
+  _id: string; // Use string on the frontend
+  slug: string;
+  name: string;
+  type: "pre-defined";
+}
+
 export interface ICategoryContext {
   topLevelCategories: Category[];
   subCategories: Category[];
-  filterableSubCategories: Category[];
+  filterableSubCategories: mainCategory[];
+  // filterableSubCategories: Category[];
   loading: boolean;
   error: string | null;
   fetchTopLevelCategories: () => Promise<void>;
   fetchSubCategories: (parentId: string) => Promise<void>;
-  fetchFilterableSubCategories: (
-    parentId: string,
-    threshold?: number
-  ) => Promise<void>;
+  fetchFilterableSubCategories: () => Promise<void>;
+  // fetchFilterableSubCategories: (
+  //   parentId: string,
+  //   threshold?: number
+  // ) => Promise<void>;
   createSubCategory: (
     parentId: string,
     data: CreateSubCategoryPayload

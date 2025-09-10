@@ -4,189 +4,96 @@ import { Card, CardContent } from "@/components/common/wrappers/Card";
 import Avatar from "@/components/common/wrappers/Avatar";
 import Badge from "@/components/common/wrappers/Badge";
 import AspectRatio from "@/components/common/wrappers/AspectRatio";
-import {
-  ThumbsUp,
-  MessageCircle,
-  Bookmark,
-  MoreHorizontal,
-} from "lucide-react";
+import { Heart, MessageCircle,ThumbsUp,Bookmark,MoreHorizontal } from "lucide-react";
+import { cn } from "@/lib/utils";
+import type { LayoutType } from "../../common/subComps/layout-toggle";
+import type { Blog } from "@/types/api"; // 1. Import the actual Blog type from your API types
 
-// Define the props for the BlogCard to make it reusable
 interface BlogCardProps {
-  blog: {
-    slug: string;
-    thumbnailUrl: string;
-    title: string;
-    excerpt: string;
-    likeCount: number;
-    commentCount: number;
-    authorName: string;
-    authorAvatar: string;
-    topTag: string;
-  };
-  layout?: "square" | "landscape";
+  blog: Blog; // 2. Expect the real Blog type
+  layout?: LayoutType;
 }
 
 const BlogCard: React.FC<BlogCardProps> = ({ blog, layout = "square" }) => {
-  if (layout === "landscape") {
-    return (
-      <Card className="backdrop-blur-lg p-0  dark:bg-background/50 bg-background/10 border border-[#E0E1E1/30] dark:border-[#E0E1E1/40] w-full rounded-2xl shadow-lg shadow-black/5 dark:shadow-black/20 transition-all duration-300 hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-black/30 hover:bg-[#ffffff]/30 hover:border-[#E0E1E1/40] overflow-hidden relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-transparent dark:before:from-white/5 before:pointer-events-none before:rounded-2xl pb-0">
-        <CardContent className="p-4 flex gap-4 relative z-10">
-          {/* Left side content */}
-          <div className="flex-1 flex flex-col justify-between min-h-[200px]">
-            {/* Author info at top */}
-            <div className="flex items-center gap-2 mb-3">
-              <Avatar
-                src={blog.authorAvatar}
-                alt={blog.authorName}
-                className="w-10 h-10 ring-2 ring-white/30 dark:ring-white/20 hover:ring-white/50 dark:hover:ring-white/30 transition-all duration-200"
-              />
-              <span className="text-base font-semibold text-gray-900/90 dark:text-white/90">
-                {blog.authorName}
-              </span>
-            </div>
+  const isLandscape = layout === "landscape";
 
-            {/* Tags */}
-            <div className="flex gap-2 mb-4">
-              <Badge
-                variant="secondary"
-                className="backdrop-blur-sm bg-green-500/80 text-white border-none hover:bg-green-600/80 transition-all duration-200 text-xs"
-              >
-                {blog.topTag}
-              </Badge>
-              <Badge
-                variant="secondary"
-                className="backdrop-blur-sm bg-green-600/60 text-white border-none hover:bg-green-700/60 transition-all duration-200 text-xs"
-              >
-                subcategorie tag
-              </Badge>
-            </div>
-
-            {/* Title section */}
-            <Link to={`/blog/${blog.slug}`} className="block mb-3">
-              <h3 className="font-bold text-lg leading-tight text-gray-900/90 dark:text-white/90 line-clamp-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
-                {blog.title}
-              </h3>
-            </Link>
-
-            {/* Content section */}
-            <div className="mb-4 flex-1">
-              <p className="text-sm text-gray-700/80 dark:text-gray-300/80 line-clamp-3">
-                {blog.excerpt}
-              </p>
-            </div>
-
-            {/* Action Bar at bottom */}
-            <div className="flex items-center justify-between text-gray-600/80 dark:text-gray-400/80">
-              <div className="flex items-center">
-                <button className="flex items-center gap-1.5 hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-200 p-1 rounded-lg hover:bg-white/20 dark:hover:bg-white/10">
-                  <ThumbsUp className="p-0" size={18} />
-                  <span className="text-sm pr-2">{blog.likeCount}</span>
-                </button>
-                <button className="flex items-center gap-1.5 hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-200 p-1 rounded-lg hover:bg-white/20 dark:hover:bg-white/10">
-                  <MessageCircle size={18} />
-                  <span className="text-sm">{blog.commentCount}</span>
-                </button>
-              </div>
-              <div className="flex items-center gap-3">
-                <button className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-200 p-1 rounded-lg hover:bg-white/20 dark:hover:bg-white/10">
-                  <Bookmark size={18} />
-                </button>
-                <button className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-200 p-1 rounded-lg hover:bg-white/20 dark:hover:bg-white/10">
-                  <MoreHorizontal size={18} />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Right side image */}
-          <div className="w-92 flex-shrink-0">
-            <Link to={`/blog/${blog.slug}`} className="block">
-              <AspectRatio ratio={16 / 9}>
-                <img
-                  src={blog.thumbnailUrl || "/placeholder.svg"}
-                  alt={blog.title}
-                  className="w-full h-full object-cover rounded-xl opacity-90 hover:opacity-100 transition-opacity duration-300"
-                />
-              </AspectRatio>
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  // 3. Provide default values for interaction counts, as they may not be on the main blog object yet.
+  const likeCount = blog.likeCount ?? 0;
+  const commentCount = blog.commentCount ?? 0;
 
   return (
-    <Card className="backdrop-blur-lg dark:bg-background/50 bg-foreground/10   w-full max-w-sm rounded-2xl shadow-lg shadow-black/5 dark:shadow-black/20 transition-all duration-300 hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-black/30 hover:bg-white/30 hover:border-[#E0E1E1/40] flex flex-col overflow-hidden relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-transparent dark:before:from-white/5 before:pointer-events-none before:rounded-2xl pb-0">
-      <Link to={`/blog/${blog.slug}`} className="block relative z-10">
-        <AspectRatio ratio={16 / 9}>
-          <img
-            src={blog.thumbnailUrl || "/placeholder.svg"}
-            alt={blog.title}
-            className="w-[90%] h-full mx-auto object-cover rounded-xl opacity-90 hover:opacity-100 transition-opacity duration-300"
-          />
-        </AspectRatio>
-      </Link>
+    <Link
+      to={`/blog/${blog.slug}`}
+      className={cn(
+        "group block w-full overflow-hidden rounded-2xl bg-card border border-border shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1",
+        isLandscape ? "flex flex-col sm:flex-row" : "flex flex-col"
+      )}
+    >
+      {/* Thumbnail */}
+      <div
+        className={cn(
+          "bg-muted overflow-hidden",
+          isLandscape
+            ? "w-full sm:w-2/5 md:w-1/3 flex-shrink-0"
+            : "w-full aspect-video"
+        )}
+      >
+        <img
+          src={blog.thumbnail} // 4. Use `thumbnail` from the API model
+          alt={blog.title}
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+        />
+      </div>
 
-      <CardContent className="p-4 flex flex-col flex-grow justify-between relative z-10">
-        {/* Top section for title and excerpt */}
+      {/* Content */}
+      <div className="flex flex-col justify-between p-4 sm:p-5 flex-grow">
         <div>
-          <Link to={`/blog/${blog.slug}`} className="block">
-            <h3 className="font-bold text-lg leading-tight text-gray-900/90 dark:text-white/90 line-clamp-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
-              {blog.title}
-            </h3>
-          </Link>
-          <p className="text-sm text-gray-700/80 dark:text-gray-300/80 mt-2 line-clamp-3">
+          <span className="text-xs font-semibold uppercase text-primary tracking-wider">
+            {blog.categories?.[0]?.name || "General"}{" "}
+            {/* 5. Use the categories array */}
+          </span>
+          <h3
+            className={cn(
+              "font-bold text-foreground mt-2 line-clamp-2",
+              isLandscape ? "text-xl" : "text-lg"
+            )}
+          >
+            {blog.title}
+          </h3>
+          <p className="text-muted-foreground text-sm mt-2 line-clamp-3">
             {blog.excerpt}
           </p>
         </div>
 
-        {/* Bottom section for actions and author info */}
-        <div>
-          {/* Action Bar */}
-          <div className="flex items-center justify-between text-gray-600/80 dark:text-gray-400/80 pt-2 pb-3">
-            <div className="flex items-center">
-              <button className="flex items-center gap-1.5 hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-200 p-1 rounded-lg hover:bg-white/20 dark:hover:bg-white/10">
-                <ThumbsUp className="p-0" size={18} />
-                <span className="text-sm pr-2">{blog.likeCount}</span>
-              </button>
-              <button className="flex items-center gap-1.5 hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-200 p-1 rounded-lg hover:bg-white/20 dark:hover:bg-white/10">
-                <MessageCircle size={18} />
-                <span className="text-sm">{blog.commentCount}</span>
-              </button>
-            </div>
-            <div className="flex items-center gap-3">
-              <button className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-200 p-1 rounded-lg hover:bg-white/20 dark:hover:bg-white/10">
-                <Bookmark size={18} />
-              </button>
-              <button className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-200 p-1 rounded-lg hover:bg-white/20 dark:hover:bg-white/10">
-                <MoreHorizontal size={18} />
-              </button>
+        {/* Author and Stats */}
+        <div className="flex items-center justify-between mt-4 pt-4 border-t border-border/60">
+          <div className="flex items-center">
+            {/* 6. Access the nested `owner` object for author details */}
+            <img
+              src={blog.owner.avatar}
+              alt={blog.owner.fullName}
+              className="w-8 h-8 rounded-full mr-3 object-cover"
+            />
+            <div>
+              <p className="text-sm font-semibold text-foreground">
+                {blog.owner.fullName}
+              </p>
+              <p className="text-xs text-muted-foreground">5 min read</p>
             </div>
           </div>
-
-          {/* Author and Tag */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Avatar
-                src={blog.authorAvatar}
-                alt={blog.authorName}
-                className="w-12 h-12 ring-2 ring-white/30 dark:ring-white/20 hover:ring-white/50 dark:hover:ring-white/30 transition-all duration-200"
-              />
-              <span className="text-[18px] font-semibold text-gray-900/90 dark:text-white/90">
-                {blog.authorName}
-              </span>
-            </div>
-            <Badge
-              variant="secondary"
-              className="backdrop-blur-sm bg-white/40 dark:bg-black/40 border-white/50 dark:border-white/20 text-gray-800 dark:text-gray-200 hover:bg-white/50 dark:hover:bg-black/50 transition-all duration-200"
-            >
-              {blog.topTag}
-            </Badge>
+          <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+            <span className="flex items-center">
+              <Heart className="w-4 h-4 mr-1.5" />
+              {likeCount}
+            </span>
+            <span className="flex items-center">
+              <MessageCircle className="w-4 h-4 mr-1.5" />
+              {commentCount}
+            </span>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </Link>
   );
 };
 
@@ -224,22 +131,7 @@ export default BlogCard;
 // const BlogCard: React.FC<BlogCardProps> = ({ blog, layout = "square" }) => {
 //   if (layout === "landscape") {
 //     return (
-//       <Card className="backdrop-blur-xl bg-white/20 dark:bg-[#171717] border border-[#E0E1E1/30] dark:border-[#E0E1E1/40] w-full rounded-2xl shadow-lg shadow-black/5 dark:shadow-black/20 transition-all duration-300 hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-black/30
-//         hover:bg-white/30
-//         hover:border-[#E0E1E1/40]
-//         overflow-hidden
-//         relative
-//         before:absolute
-//         before:inset-0
-//         before:bg-gradient-to-br
-//         before:from-white/10
-//         before:to-transparent
-//         dark:before:from-white/5
-//         before:pointer-events-none
-//         before:rounded-2xl
-//         pb-0
-//       "
-//       >
+//       <Card className="backdrop-blur-lg p-0  dark:bg-background/50 bg-background/10 border border-[#E0E1E1/30] dark:border-[#E0E1E1/40] w-full rounded-2xl shadow-lg shadow-black/5 dark:shadow-black/20 transition-all duration-300 hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-black/30 hover:bg-[#ffffff]/30 hover:border-[#E0E1E1/40] overflow-hidden relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-transparent dark:before:from-white/5 before:pointer-events-none before:rounded-2xl pb-0">
 //         <CardContent className="p-4 flex gap-4 relative z-10">
 //           {/* Left side content */}
 //           <div className="flex-1 flex flex-col justify-between min-h-[200px]">
@@ -248,26 +140,9 @@ export default BlogCard;
 //               <Avatar
 //                 src={blog.authorAvatar}
 //                 alt={blog.authorName}
-//                 className="
-//                   w-10
-//                   h-10
-//                   ring-2
-//                   ring-white/30
-//                   dark:ring-white/20
-//                   hover:ring-white/50
-//                   dark:hover:ring-white/30
-//                   transition-all
-//                   duration-200
-//                 "
+//                 className="w-10 h-10 ring-2 ring-white/30 dark:ring-white/20 hover:ring-white/50 dark:hover:ring-white/30 transition-all duration-200"
 //               />
-//               <span
-//                 className="
-//                 text-base
-//                 font-semibold
-//                 text-gray-900/90
-//                 dark:text-white/90
-//               "
-//               >
+//               <span className="text-base font-semibold text-gray-900/90 dark:text-white/90">
 //                 {blog.authorName}
 //               </span>
 //             </div>
@@ -276,31 +151,15 @@ export default BlogCard;
 //             <div className="flex gap-2 mb-4">
 //               <Badge
 //                 variant="secondary"
-//                 className="
-//                   backdrop-blur-sm
-//                   bg-green-500/80
-//                   text-white
-//                   border-none
-//                   hover:bg-green-600/80
-//                   transition-all
-//                   duration-200
-//                   text-xs
-//                 "
+//                 className="backdrop-blur-sm bg-green-500/80 text-white border-none hover:bg-green-600/80 transition-all duration-200 text-xs"
 //               >
+                  // {blog.categories?.[0]?.name || "General";}
+
 //                 {blog.topTag}
 //               </Badge>
 //               <Badge
 //                 variant="secondary"
-//                 className="
-//                   backdrop-blur-sm
-//                   bg-green-600/60
-//                   text-white
-//                   border-none
-//                   hover:bg-green-700/60
-//                   transition-all
-//                   duration-200
-//                   text-xs
-//                 "
+//                 className="backdrop-blur-sm bg-green-600/60 text-white border-none hover:bg-green-700/60 transition-all duration-200 text-xs"
 //               >
 //                 subcategorie tag
 //               </Badge>
@@ -308,113 +167,35 @@ export default BlogCard;
 
 //             {/* Title section */}
 //             <Link to={`/blog/${blog.slug}`} className="block mb-3">
-//               <h3
-//                 className="
-//                 font-bold
-//                 text-lg
-//                 leading-tight
-//                 text-gray-900/90
-//                 dark:text-white/90
-//                 line-clamp-2
-//                 hover:text-blue-600
-//                 dark:hover:text-blue-400
-//                 transition-colors
-//                 duration-200
-//               "
-//               >
+//               <h3 className="font-bold text-lg leading-tight text-gray-900/90 dark:text-white/90 line-clamp-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
 //                 {blog.title}
 //               </h3>
 //             </Link>
 
 //             {/* Content section */}
 //             <div className="mb-4 flex-1">
-//               <p
-//                 className="
-//                 text-sm
-//                 text-gray-700/80
-//                 dark:text-gray-300/80
-//                 line-clamp-3
-//               "
-//               >
+//               <p className="text-sm text-gray-700/80 dark:text-gray-300/80 line-clamp-3">
 //                 {blog.excerpt}
 //               </p>
 //             </div>
 
 //             {/* Action Bar at bottom */}
-//             <div
-//               className="
-//               flex
-//               items-center
-//               justify-between
-//               text-gray-600/80
-//               dark:text-gray-400/80
-//             "
-//             >
+//             <div className="flex items-center justify-between text-gray-600/80 dark:text-gray-400/80">
 //               <div className="flex items-center">
-//                 <button
-//                   className="
-//                   flex
-//                   items-center
-//                   gap-1.5
-//                   hover:text-blue-500
-//                   dark:hover:text-blue-400
-//                   transition-colors
-//                   duration-200
-//                   p-1
-//                   rounded-lg
-//                   hover:bg-white/20
-//                   dark:hover:bg-white/10
-//                 "
-//                 >
+//                 <button className="flex items-center gap-1.5 hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-200 p-1 rounded-lg hover:bg-white/20 dark:hover:bg-white/10">
 //                   <ThumbsUp className="p-0" size={18} />
 //                   <span className="text-sm pr-2">{blog.likeCount}</span>
 //                 </button>
-//                 <button
-//                   className="
-//                   flex
-//                   items-center
-//                   gap-1.5
-//                   hover:text-blue-500
-//                   dark:hover:text-blue-400
-//                   transition-colors
-//                   duration-200
-//                   p-1
-//                   rounded-lg
-//                   hover:bg-white/20
-//                   dark:hover:bg-white/10
-//                 "
-//                 >
+//                 <button className="flex items-center gap-1.5 hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-200 p-1 rounded-lg hover:bg-white/20 dark:hover:bg-white/10">
 //                   <MessageCircle size={18} />
 //                   <span className="text-sm">{blog.commentCount}</span>
 //                 </button>
 //               </div>
 //               <div className="flex items-center gap-3">
-//                 <button
-//                   className="
-//                   hover:text-blue-500
-//                   dark:hover:text-blue-400
-//                   transition-colors
-//                   duration-200
-//                   p-1
-//                   rounded-lg
-//                   hover:bg-white/20
-//                   dark:hover:bg-white/10
-//                 "
-//                 >
+//                 <button className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-200 p-1 rounded-lg hover:bg-white/20 dark:hover:bg-white/10">
 //                   <Bookmark size={18} />
 //                 </button>
-//                 <button
-//                   className="
-//                   hover:text-blue-500
-//                   dark:hover:text-blue-400
-//                   transition-colors
-//                   duration-200
-//                   p-1
-//                   rounded-lg
-//                   hover:bg-white/20
-//                   dark:hover:bg-white/10
-//                 "
-//                 >
+//                 <button className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-200 p-1 rounded-lg hover:bg-white/20 dark:hover:bg-white/10">
 //                   <MoreHorizontal size={18} />
 //                 </button>
 //               </div>
@@ -426,8 +207,10 @@ export default BlogCard;
 //             <Link to={`/blog/${blog.slug}`} className="block">
 //               <AspectRatio ratio={16 / 9}>
 //                 <img
+                 //  src={blog.thumbnail}
 //                   src={blog.thumbnailUrl || "/placeholder.svg"}
 //                   alt={blog.title}
+                  // alt={blog.title}
 //                   className="w-full h-full object-cover rounded-xl opacity-90 hover:opacity-100 transition-opacity duration-300"
 //                 />
 //               </AspectRatio>
@@ -439,42 +222,7 @@ export default BlogCard;
 //   }
 
 //   return (
-//     <Card
-//       className="
-//       backdrop-blur-xl
-//       bg-white/20
-//       dark:bg-[#171717]
-//       border
-//       border-[#E0E1E1/30]
-//       dark:border-[#E0E1E1/40]
-//       w-full
-//       max-w-sm
-//       rounded-2xl
-//       shadow-lg
-//       shadow-black/5
-//       dark:shadow-black/20
-//       transition-all
-//       duration-300
-//       hover:shadow-xl
-//       hover:shadow-black/10
-//       dark:hover:shadow-black/30
-//       hover:bg-white/30
-//       hover:border-[#E0E1E1/40]
-//       flex
-//       flex-col
-//       overflow-hidden
-//       relative
-//       before:absolute
-//       before:inset-0
-//       before:bg-gradient-to-br
-//       before:from-white/10
-//       before:to-transparent
-//       dark:before:from-white/5
-//       before:pointer-events-none
-//       before:rounded-2xl
-//       pb-0
-//     "
-//     >
+//     <Card className="backdrop-blur-lg dark:bg-background/50 bg-foreground/10   w-full max-w-sm rounded-2xl shadow-lg shadow-black/5 dark:shadow-black/20 transition-all duration-300 hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-black/30 hover:bg-white/30 hover:border-[#E0E1E1/40] flex flex-col overflow-hidden relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-transparent dark:before:from-white/5 before:pointer-events-none before:rounded-2xl pb-0">
 //       <Link to={`/blog/${blog.slug}`} className="block relative z-10">
 //         <AspectRatio ratio={16 / 9}>
 //           <img
@@ -489,32 +237,11 @@ export default BlogCard;
 //         {/* Top section for title and excerpt */}
 //         <div>
 //           <Link to={`/blog/${blog.slug}`} className="block">
-//             <h3
-//               className="
-//               font-bold
-//               text-lg
-//               leading-tight
-//               text-gray-900/90
-//               dark:text-white/90
-//               line-clamp-2
-//               hover:text-blue-600
-//               dark:hover:text-blue-400
-//               transition-colors
-//               duration-200
-//             "
-//             >
+//             <h3 className="font-bold text-lg leading-tight text-gray-900/90 dark:text-white/90 line-clamp-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
 //               {blog.title}
 //             </h3>
 //           </Link>
-//           <p
-//             className="
-//             text-sm
-//             text-gray-700/80
-//             dark:text-gray-300/80
-//             mt-2
-//             line-clamp-3
-//           "
-//           >
+//           <p className="text-sm text-gray-700/80 dark:text-gray-300/80 mt-2 line-clamp-3">
 //             {blog.excerpt}
 //           </p>
 //         </div>
@@ -522,82 +249,22 @@ export default BlogCard;
 //         {/* Bottom section for actions and author info */}
 //         <div>
 //           {/* Action Bar */}
-//           <div
-//             className="
-//             flex
-//             items-center
-//             justify-between
-//             text-gray-600/80
-//             dark:text-gray-400/80
-//             pt-2
-//             pb-3
-//           "
-//           >
+//           <div className="flex items-center justify-between text-gray-600/80 dark:text-gray-400/80 pt-2 pb-3">
 //             <div className="flex items-center">
-//               <button
-//                 className="
-//                 flex
-//                 items-center
-//                 gap-1.5
-//                 hover:text-blue-500
-//                 dark:hover:text-blue-400
-//                 transition-colors
-//                 duration-200
-//                 p-1
-//                 rounded-lg
-//                 hover:bg-white/20
-//                 dark:hover:bg-white/10
-//               "
-//               >
+//               <button className="flex items-center gap-1.5 hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-200 p-1 rounded-lg hover:bg-white/20 dark:hover:bg-white/10">
 //                 <ThumbsUp className="p-0" size={18} />
 //                 <span className="text-sm pr-2">{blog.likeCount}</span>
 //               </button>
-//               <button
-//                 className="
-//                 flex
-//                 items-center
-//                 gap-1.5
-//                 hover:text-blue-500
-//                 dark:hover:text-blue-400
-//                 transition-colors
-//                 duration-200
-//                 p-1
-//                 rounded-lg
-//                 hover:bg-white/20
-//                 dark:hover:bg-white/10
-//               "
-//               >
+//               <button className="flex items-center gap-1.5 hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-200 p-1 rounded-lg hover:bg-white/20 dark:hover:bg-white/10">
 //                 <MessageCircle size={18} />
 //                 <span className="text-sm">{blog.commentCount}</span>
 //               </button>
 //             </div>
 //             <div className="flex items-center gap-3">
-//               <button
-//                 className="
-//                 hover:text-blue-500
-//                 dark:hover:text-blue-400
-//                 transition-colors
-//                 duration-200
-//                 p-1
-//                 rounded-lg
-//                 hover:bg-white/20
-//                 dark:hover:bg-white/10
-//               "
-//               >
+//               <button className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-200 p-1 rounded-lg hover:bg-white/20 dark:hover:bg-white/10">
 //                 <Bookmark size={18} />
 //               </button>
-//               <button
-//                 className="
-//                 hover:text-blue-500
-//                 dark:hover:text-blue-400
-//                 transition-colors
-//                 duration-200
-//                 p-1
-//                 rounded-lg
-//                 hover:bg-white/20
-//                 dark:hover:bg-white/10
-//               "
-//               >
+//               <button className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-200 p-1 rounded-lg hover:bg-white/20 dark:hover:bg-white/10">
 //                 <MoreHorizontal size={18} />
 //               </button>
 //             </div>
@@ -609,44 +276,15 @@ export default BlogCard;
 //               <Avatar
 //                 src={blog.authorAvatar}
 //                 alt={blog.authorName}
-//                 className="
-//                   w-12
-//                   h-12
-//                   ring-2
-//                   ring-white/30
-//                   dark:ring-white/20
-//                   hover:ring-white/50
-//                   dark:hover:ring-white/30
-//                   transition-all
-//                   duration-200
-//                 "
+//                 className="w-12 h-12 ring-2 ring-white/30 dark:ring-white/20 hover:ring-white/50 dark:hover:ring-white/30 transition-all duration-200"
 //               />
-//               <span
-//                 className="
-//                 text-[18px]
-//                 font-semibold
-//                 text-gray-900/90
-//                 dark:text-white/90
-//               "
-//               >
+//               <span className="text-[18px] font-semibold text-gray-900/90 dark:text-white/90">
 //                 {blog.authorName}
 //               </span>
 //             </div>
 //             <Badge
 //               variant="secondary"
-//               className="
-//                 backdrop-blur-sm
-//                 bg-white/40
-//                 dark:bg-black/40
-//                 border-white/50
-//                 dark:border-white/20
-//                 text-gray-800
-//                 dark:text-gray-200
-//                 hover:bg-white/50
-//                 dark:hover:bg-black/50
-//                 transition-all
-//                 duration-200
-//               "
+//               className="backdrop-blur-sm bg-white/40 dark:bg-black/40 border-white/50 dark:border-white/20 text-gray-800 dark:text-gray-200 hover:bg-white/50 dark:hover:bg-black/50 transition-all duration-200"
 //             >
 //               {blog.topTag}
 //             </Badge>

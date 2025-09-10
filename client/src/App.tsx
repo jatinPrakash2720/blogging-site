@@ -3,7 +3,9 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import PrivateRoute from "./components/features/route/PrivateRoute";
 import PublicRoute from "./components/features/route/PublicRoute";
 // Import your page components
-import HomePage from "./pages/HomePage";
+// import HomePage from "./pages/HomePage";
+import HomePage from "./pages/HomePage2";
+// import HomePage from "./pages/HomePage1";
 import ProfilePage from "./pages/ProfilePage";
 import BlogDetailPage from "./pages/BlogDetailPage";
 import AuthPage from "./pages/AuthPage";

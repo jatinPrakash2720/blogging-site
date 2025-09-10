@@ -7,7 +7,7 @@ import { Home, Compass, Tag } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
 import ParticleBackground from "@/components/common/background/ParticeBackground";
-import { useAuth } from "@/store/auth";
+// import { useAuth } from "@/store/auth";
 import { useBlogs } from "@/store/blog";
 import FeatureBar from "@/components/features/blog/FeatureBar";
 import { MenuBar } from "@/components/common/subComps/MenuBar";
@@ -16,7 +16,7 @@ import { useInView } from "@/hooks/UseInView";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { LayoutType } from "../components/common/subComps/layout-toggle";
-import { useTheme } from "@/store/theme";
+// import { useTheme } from "@/store/theme";
 
 interface MenuBarItem {
   slug: string;
@@ -505,47 +505,78 @@ const forYouBlogs = [
 ];
 
 const HomePage: React.FC = () => {
+
   // const [theme, setTheme] = useState("light");
   const [activeFilter, setActiveFilter] = useState<string>("for-you");
-  const [blogsToDisplay, setBlogsToDisplay] = useState(forYouBlogs);
+  // const [blogsToDisplay, setBlogsToDisplay] = useState(forYouBlogs);
   const [layout, setLayout] = useState<LayoutType>("square");
   const [headerHeight, setHeaderHeight] = useState(0);
+   const {
+     loading,
+     pagination,
+     feedPagination,
+     fetchAllBlogs,
+     fetchFollowingFeed,
+     fetchBlogsByCategory,
+  } = useBlogs();
+  
+  // const loadMoreRef = useRef(null);
+  const [loadMoreRef, inView] = useInView({ threshold: 0.5 });
 
   const [featureBarRef, isFeatureBarVisible] = useInView({ threshold: 0.5 });
 
-  const { loading } = useBlogs();
-  const { currentUser } = useAuth();
+   const isFeed = activeFilter === "for-you";
+  //  const blogsToDisplay = isFeed ? feedBlogs : allBlogs;
+   const currentPagination = isFeed ? feedPagination : pagination;
+  // const { loading } = useBlogs();
+  // const { currentUser } = useAuth();
 
   // const handleThemeChange = (newTheme: string) => {
   //   setTheme(newTheme);
   // };
+  
 
-  const usetheme = useTheme();
-  const theme = usetheme.theme;
-  const menuItems: MenuBarItem[] = [
+  // const usetheme = useTheme();
+  // const theme = usetheme.theme;
+  const menuItems = [
     { slug: "for-you", label: "For You", icon: Home },
     { slug: "explore", label: "Explore", icon: Compass },
-    ...mockFavoriteTags.map((tag) => ({
-      slug: tag.slug,
-      label: tag.name,
-      icon: Tag,
-    })),
+    { slug: "technology", label: "Technology", icon: Tag },
+    { slug: "design", label: "Design", icon: Tag },
+    { slug: "productivity", label: "Productivity", icon: Tag },
   ];
+
 
   useEffect(() => {
     if (activeFilter === "for-you") {
-      setBlogsToDisplay(forYouBlogs);
+      fetchFollowingFeed({ page: 1, limit: 10 });
     } else if (activeFilter === "explore") {
-      setBlogsToDisplay(exploreBlogs);
-    } else if (activeFilter === "technology") {
-      setBlogsToDisplay(technologyBlogs);
-    } else if (activeFilter === "travel") {
-      setBlogsToDisplay(travelBlogs);
-    } else if (activeFilter === "food") {
-      setBlogsToDisplay(foodBlogs);
+      fetchAllBlogs({ page: 1, limit: 10 });
+    } else {
+      fetchBlogsByCategory(activeFilter, { page: 1, limit: 10 });
     }
-  }, [activeFilter]);
+  }, [activeFilter, fetchAllBlogs, fetchFollowingFeed, fetchBlogsByCategory]);
 
+   useEffect(() => {
+     if (inView && !loading && currentPagination?.hasNextPage) {
+       const nextPage = currentPagination.page + 1;
+       if (activeFilter === "for-you") {
+         fetchFollowingFeed({ page: nextPage, limit: 10 });
+       } else if (activeFilter === "explore") {
+         fetchAllBlogs({ page: nextPage, limit: 10 });
+       } else {
+         fetchBlogsByCategory(activeFilter, { page: nextPage, limit: 10 });
+       }
+     }
+   }, [
+     inView,
+     loading,
+     activeFilter,
+     currentPagination,
+     fetchAllBlogs,
+     fetchFollowingFeed,
+     fetchBlogsByCategory,
+   ]);
   return (
     <div className="min-h-screen flex flex-col">
       <Header
@@ -555,10 +586,10 @@ const HomePage: React.FC = () => {
         className="relative flex-grow w-full"
         style={{ paddingTop: `${headerHeight}px` }}
       >
-        <ParticleBackground
+        {/* <ParticleBackground
           className="fixed inset-0 -z-10"
           quantity={250}
-        />
+        /> */}
         <main className="container max-w-[95%] mx-auto px-4">
           <div className="my-6">
             <div ref={featureBarRef}>
@@ -577,7 +608,7 @@ const HomePage: React.FC = () => {
                 {loading ? (
                   <Loader />
                 ) : (
-                  <BlogList blogs={blogsToDisplay} layout={layout} />
+                  <BlogList activeFilter={activeFilter} layout={layout} />
                 )}
               </div>
               <div className="hidden lg:block lg:col-span-1">
