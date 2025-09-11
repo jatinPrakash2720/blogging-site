@@ -6,6 +6,7 @@ import {
   getReadHistory,
   getUserPageProfile,
   loginUser,
+  loginWithGithub,
   loginWithGoogle,
   logoutUser,
   refreshAccessToken,
@@ -54,10 +55,18 @@ router
 router.route("/google/callback").get(
   passport.authenticate("google", {
     session: false,
-    failureRedirect: `${process.env.CORS_ORIGIN.split(",")[1]}/login`,
+    failureRedirect: `${process.env.CORS_ORIGIN.split(",")[0]}/login`,
   }),
   loginWithGoogle
 );
+router.route("/github").get(passport.authenticate("github", { scope: ["user:email"] }));
+router.route("/github/callback").get(
+  passport.authenticate("github", {
+    session: false,
+    failureRedirect:`${process.env.CORS_ORIGIN.split(",")[0]}/login`,
+  }),
+  loginWithGithub
+)
 router.route("/forgot-password").post(forgotPassword);
 router.route("/restore-password/:token").post(restorePassword);
 // router.route("/login").post(registerUser);

@@ -1,9 +1,8 @@
 import mongoose, { Schema } from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import crypto from "crypto"; 
+import crypto from "crypto";
 import MongooseDelete from "mongoose-delete";
-
 
 const userSchema = new Schema(
   {
@@ -44,17 +43,23 @@ const userSchema = new Schema(
       },
     ],
     googleId: {
-      type:String,
+      type: String,
+    },
+    githubId: {
+      // <-- ADD THIS
+      type: String,
     },
     password: {
       type: String,
-      required: function () { return !this.googleId; },
+      required: function () {
+        return !this.googleId && !this.githubId;
+      },
     },
     refreshToken: {
       type: String,
     },
     forgotPasswordToken: String,
-    forgotPasswordExpiry:Date,
+    forgotPasswordExpiry: Date,
   },
   { timestamps: true }
 );
@@ -103,11 +108,14 @@ userSchema.methods.generateRefreshToken = function () {
 userSchema.methods.generatePasswordResetToken = function () {
   const resetToken = crypto.randomBytes(20).toString("hex");
 
-  this.forgotPasswordToken = crypto.createHash("sha256").update(resetToken).digest("hex");
-  
+  this.forgotPasswordToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
   this.forgotPasswordExpiry = Date.now() + 10 * 60 * 1000; //TOken expires in 10 minutes
 
   return resetToken;
-}
+};
 userSchema.plugin(MongooseDelete, { overrideMethods: "all", deleteAt: true });
 export const User = mongoose.model("User", userSchema);

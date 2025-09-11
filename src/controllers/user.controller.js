@@ -539,14 +539,23 @@ const loginWithGoogle = asyncHandler(async (req, res) => {
   const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
     user._id
   );
-  const redirectOrigin = process.env.CORS_ORIGIN.split(",")[1];
-
+  const redirectOrigin = process.env.CORS_ORIGIN.split(",")[0];
+  const redirectURL = `${redirectOrigin}/auth/google/callback`;
   return res
     .status(200)
     .cookie("accessToken", accessToken, option)
     .cookie("refreshToken", refreshToken, option)
-    .redirect(redirectOrigin);
+    .redirect(redirectURL);
 });
+const loginWithGithub = asyncHandler(async (req, res) => {
+  const user = req.user;
+  const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
+  const redirectOrigin = process.env.CORS_ORIGIN.split(",")[0];
+
+  const redirectURL = `${redirectOrigin}/auth/github/callback`;
+
+  return res.status(200).cookie("accessToken", accessToken, option).cookie("refreshToken", refreshToken, option).redirect(redirectURL);
+})
 const forgotPassword = asyncHandler(async (req, res) => {
   const { identifier } = req.body;
   if (!identifier) {
@@ -642,6 +651,7 @@ export {
   getUserPageProfile,
   getReadHistory,
   loginWithGoogle,
+  loginWithGithub,
   forgotPassword,
   restorePassword,
 };
