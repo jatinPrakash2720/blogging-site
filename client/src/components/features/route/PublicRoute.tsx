@@ -1,27 +1,27 @@
-import React, {type ReactNode } from "react";
+import React, { type ReactNode } from "react";
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../../../store/auth"; // Corrected path
-import Loader from "@/components/ui/Loader"; // Corrected path
+import { useAuth } from "@/store/auth";
+import Loader from "@/components/ui/Loader";
 
 /**
  * A component that renders its children only if the user is NOT authenticated.
- * While checking for authentication, it shows a loading indicator.
- * If the user is already authenticated, it redirects them to the homepage.
+ * If the user is already logged in, it redirects them to the main app homepage ('/home').
  */
 const PublicRoute: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { isAuthenticated, isAuthReady } = useAuth();
 
-  // Show a loading spinner while the auth state is being determined.
+  // While the authentication state is being determined, show a full-page loader
+  // to prevent any content flashes.
   if (!isAuthReady) {
     return <Loader />;
   }
 
-  // If the user is already logged in, redirect them away from public-only pages.
+  // If the user is authenticated, redirect them away from this public page.
   if (isAuthenticated) {
-    return <Navigate to="/" replace />; // Redirect to the homepage
+    return <Navigate to="/home" replace />;
   }
 
-  // If the user is not authenticated, render the public component (e.g., Login, Register).
+  // If the user is not authenticated, render the requested public page (e.g., Login).
   return <>{children}</>;
 };
 

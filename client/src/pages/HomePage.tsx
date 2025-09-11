@@ -93,10 +93,10 @@ const HomePage: React.FC = () => {
       <Header onHeightChange={setHeaderHeight} />
       <div
         className="relative flex-grow w-full"
-        style={{ paddingTop: `${headerHeight + 26}px` }}
+        style={{ paddingTop: `${headerHeight+14}px` }}
       >
         <main className="container max-w-full mx-auto px-4">
-          <section ref={trendingBlogRef} className="mb-12">
+          <section ref={trendingBlogRef} className="">
             <TrendingBlog
               blogs={trendingBlogs}
               isLoading={loading && trendingBlogs.length === 0}

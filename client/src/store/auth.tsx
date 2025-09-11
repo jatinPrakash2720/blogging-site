@@ -75,7 +75,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       ) {
         const success = await fetchCurrentUser(); // This will fetch YOUR user data
         if (success) {
-          navigate("/");
+          navigate("/home");
         } else {
           navigate("/auth/login");
         }
@@ -115,7 +115,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setIsAuthenticated(true);
           LocalStorage.set("token", accessToken);
           LocalStorage.set("user", user);
-          navigate("/");
+          navigate("/home");
           // (response: { user: User; accessToken: string }) => {
           //   const { user, accessToken } = response;
           //   setCurrentUser(user);
