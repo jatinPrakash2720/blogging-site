@@ -7,12 +7,12 @@ interface BackgroundProps {
 const ParticleBackground = ({ className }: BackgroundProps) => {
   // Path to the image you uploaded.
   // This assumes the image is placed in the `public` folder of your project.
-  const imageUrl1 = "/pexels-juanpphotoandvideo-1242348.jpg";
-  const imageUrl2 = "/pexels-codioful-7130475.jpg";
-  const imageUrl3 = "/pexels-splitshire-1526.jpg";
-  const imageUrl4 = "/pexels-cottonbro-9694697.jpg";
-  const imageUrl5 = "/pexels-umkreisel-app-956981.jpg";
-  const imageUrl6 = "/9f74e4d8-4c67-4ec1-b03a-410678eaef59.jpg";
+  // const imageUrl1 = "/pexels-juanpphotoandvideo-1242348.jpg";
+  // const imageUrl2 = "/pexels-codioful-7130475.jpg";
+  // const imageUrl3 = "/pexels-splitshire-1526.jpg";
+  // const imageUrl4 = "/pexels-cottonbro-9694697.jpg";
+  // const imageUrl5 = "/pexels-umkreisel-app-956981.jpg";
+  // const imageUrl6 = "/9f74e4d8-4c67-4ec1-b03a-410678eaef59.jpg";
   const imageUrl7 = "/abstract-grainy-texture.jpg";
 
   return (

@@ -4,7 +4,6 @@ import type React from "react";
 import { useState, useEffect } from "react";
 import { Camera, User, Plus, X } from "lucide-react";
 import type { ProfileSetupProps } from "@/types/components/features/auth";
-import "./auth.css";
 import FocusTrackingInput from "@/components/common/wrappers/FocusTrackingInput";
 import { useAuthProgress } from "@/store/theme";
 

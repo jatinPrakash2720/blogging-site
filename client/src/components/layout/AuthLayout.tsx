@@ -1,7 +1,6 @@
 import type React from "react";
 import ThemeToggle from "../common/wrappers/ThemeToggle";
 import { AuthProgressBar } from "./auth-progress-bar";
-import type { AuthMode } from "@/pages/AuthPage";
 interface AuthLayoutProps {
   children: React.ReactNode;
 }
@@ -24,28 +23,3 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
 };
 
 export default AuthLayout;
-
-//  <div
-//    className="min-h-screen flex items-center justify-center p-4"
-//    style={{
-//      backgroundImage: "url('/bg.jpeg')",
-//      backgroundSize: "cover",
-//      backgroundPosition: "center",
-//      backgroundRepeat: "no-repeat",
-//    }}
-//  >
-// //    <AuthCard
-//      isLoading={isLoading}
-//      email={email}
-//      setEmail={setEmail}
-//      password={password}
-//      setPassword={setPassword}
-//      rememberMe={rememberMe}
-//      setRememberMe={setRememberMe}
-//      onSignIn={handleSignIn}
-//      onSignUp={handleSignUp}
-//      onSocialLogin={handleSocialLogin}
-//      onForgotPassword={handleForgotPassword}
-//    />
-//    <Toaster />
-//  </div>;

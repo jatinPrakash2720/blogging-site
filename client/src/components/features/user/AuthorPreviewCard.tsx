@@ -9,12 +9,20 @@ interface AuthorProfileCardProps {
 
 const AuthorProfileCard: React.FC<AuthorProfileCardProps> = ({ author }) => {
   const getInitials = (name: string) => {
+
+    if (!name || typeof name !== 'string') {
+      return "?";
+    }
     return name
       .split(" ")
       .map((n) => n[0])
       .join("")
       .toUpperCase();
   };
+
+  if (!author) {
+    return null;
+  }
   return (
     <div className="w-full dark:bg-background/50  bg-background/10 backdrop-blur-lg border border-border rounded-2xl  rounded-b-none shadow-sm p-4">
       <div className="flex items-center gap-4">

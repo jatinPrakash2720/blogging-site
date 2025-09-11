@@ -1,4 +1,3 @@
-import * as React from "react";
 // 1. Import all the InputOTP components from the raw Shadcn UI file
 import {
   InputOTP as ShadcnInputOTP,

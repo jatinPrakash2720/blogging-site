@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
   User,
@@ -17,7 +17,6 @@ import {
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuthProgress } from "@/store/theme";
-import { GoogleIcon } from "../icons/GoogleIcon";
 
 export interface AuthStep {
   id: string;
@@ -78,21 +77,6 @@ const authFlows = {
       label: "Set Confirm Password",
       icon: Lock,
     },
-    // {
-    //   id: "click-term",
-    //   label: "Click Checkbox",
-    //   icon: MousePointerClick,
-    // },
-    // {
-    //   id: "create-account",
-    //   label: "Create Account",
-    //   icon: UserPlus,
-    // },
-    // {
-    //   id: "use-google",
-    //   label: "Continue with Google",
-    //   icon: GoogleIcon,
-    // },
     {
       id: "profile-setup",
       label: "Profile Setup",
@@ -164,7 +148,6 @@ export function AuthProgressBar({
   className,
 }: AuthProgressBarProps) {
   const location = useLocation();
-  const shouldReduceMotion = useReducedMotion();
   const { currentStep: contextCurrentStep } = useAuthProgress();
 
   const detectedAuthMode = authMode || getAuthModeFromPath(location.pathname);
@@ -197,8 +180,6 @@ export function AuthProgressBar({
       return () => clearTimeout(timer);
     }
   }, [detectedCurrentStep]);
-
-  const centerPosition = 0; // Fixed center position
 
   return (
     <div className={cn("fixed left-8 top-0 bottom-0 z-40", className)}>

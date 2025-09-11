@@ -9,7 +9,7 @@ export const getBlogs = (params: apiInterfaces.GetBlogsParams = {}) => {
 };
 
 export const getBlog = (blogId: string) => {
-  return apiClient.get<ApiResponse<{ data: apiInterfaces.Blog }>>(
+  return apiClient.get<ApiResponse<apiInterfaces.Blog>>(
     `/blogs/${blogId}`
   );
 };

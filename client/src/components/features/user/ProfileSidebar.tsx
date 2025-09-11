@@ -6,7 +6,6 @@ import {
   User,
   BookOpen,
   BarChart2,
-  X,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils"; // Assuming you have this utility file

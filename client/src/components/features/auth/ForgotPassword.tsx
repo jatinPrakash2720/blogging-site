@@ -2,12 +2,10 @@
 
 import type React from "react";
 import { useState } from "react";
-import { ArrowLeft, Mail, User, CheckCircle, AlertCircle } from "lucide-react";
+import {  Mail, User, CheckCircle, AlertCircle } from "lucide-react";
 import type { ForgotPasswordProps } from "@/types/components/features/auth";
 import { GlassInputWrapper } from "@/components/common/subComps/GlassInputWrapper";
-import Input from "@/components/common/wrappers/Input";
 import { useTheme } from "@/store/theme";
-import { TestimonialCard } from "@/components/common/subComps/TestimonialCard";
 import Button from "@/components/common/wrappers/Button";
 import FocusTrackingInput from "@/components/common/wrappers/FocusTrackingInput";
 
@@ -18,8 +16,6 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({
     </span>
   ),
   description = "Enter your email address or username and we'll send you a link to reset your password",
-  heroImageSrc,
-  testimonials = [],
   onResetPassword,
   onGoBack,
 }) => {

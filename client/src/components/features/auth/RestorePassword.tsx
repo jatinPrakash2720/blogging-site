@@ -2,14 +2,11 @@
 
 import type React from "react";
 import { useState } from "react";
-import { Lock, CheckCircle, AlertCircle, Eye, EyeOff } from "lucide-react";
+import { CheckCircle, AlertCircle, Eye, EyeOff } from "lucide-react";
 import type {RestorePasswordProps } from "@/types/components/features/auth";
 import { GlassInputWrapper } from "@/components/common/subComps/GlassInputWrapper";
-import Input from "@/components/common/wrappers/Input";
 import Button from "@/components/common/wrappers/Button";
 import { useTheme } from "@/store/theme";
-import { TestimonialCard } from "@/components/common/subComps/TestimonialCard";
-import "./auth.css";
 import FocusTrackingInput from "@/components/common/wrappers/FocusTrackingInput";
 
 export const RestorePassword: React.FC<RestorePasswordProps> = ({
@@ -19,8 +16,6 @@ export const RestorePassword: React.FC<RestorePasswordProps> = ({
     </span>
   ),
   description = "Enter your new password below",
-  heroImageSrc,
-  testimonials = [],
   onGoBack,
   onRestorePassword,
   onGoToSignIn,

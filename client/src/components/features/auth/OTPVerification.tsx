@@ -2,13 +2,11 @@
 
 import type React from "react";
 import { useState, useEffect } from "react";
-import { ArrowLeft, RefreshCw } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 import type { OTPVerificationPageProps } from "@/types/components/features/auth";
-import { TestimonialCard } from "@/components/common/subComps/TestimonialCard";
 import { OTPInput } from "@/components/common/subComps/OTPInputs";
 import Button from "@/components/common/wrappers/Button";
 import { useTheme } from "@/store/theme";
-import "./auth.css";
 
 export const OTPVerificationPage: React.FC<OTPVerificationPageProps> = ({
   title = (
@@ -18,11 +16,8 @@ export const OTPVerificationPage: React.FC<OTPVerificationPageProps> = ({
   ),
   description = "We've sent a verification code to your email address",
   email = "user@example.com",
-  heroImageSrc,
-  testimonials = [],
   onVerifyOTP,
   onResendCode,
-  onGoBack,
   codeLength = 6,
 }) => {
   const [otp, setOtp] = useState("");

@@ -1,4 +1,3 @@
-import * as React from "react";
 // 1. Import all the Tooltip components from the raw Shadcn UI file
 import {
   Tooltip as ShadcnTooltip,

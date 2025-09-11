@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { Grid, LayoutGrid, Rows, Rows3 } from "lucide-react";
+import { Grid,Rows} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type LayoutType = "square" | "landscape";

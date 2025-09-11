@@ -1,12 +1,8 @@
-import React, { useState } from "react";
+import  { useEffect, useState } from "react";
 import Header from "@/components/layout/Header";
-import { Particles } from "@/components/common/background/Particles";
-import { Preview } from "@/components/features/blog/Preview";
+// import { Preview } from "@/components/features/blog/Preview";
 import AuthorProfileCard from "@/components/features/user/AuthorPreviewCard";
-import CommentSection from "@/components/features/user/CommentSection";
-import FollowSuggestions from "@/components/features/user/FollowSuggestions";
-import type { User } from "@/types/api";
-import ParticleBackground from "@/components/common/background/ParticeBackground";
+import type { Blog} from "@/types/api";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -21,33 +17,22 @@ import {
   Bookmark,
   MoreHorizontal,
 } from "lucide-react";
+import { useParams } from "react-router-dom";
+import Loader from "@/components/ui/Loader";
+import { useBlogs } from "@/store/blog";
 
-// Mock data for the author
-const mockAuthor: User = {
-  _id: "author1",
-  fullName: "Sophia Carter",
-  username: "sophiacarter",
-  email: "sophia.carter@example.com", // Added missing field
-  avatar: "https://randomuser.me/api/portraits/women/57.jpg",
-  coverImage:
-    "https://images.unsplash.com/photo-1518837695005-2083393ee9b4?q=80&w=800&auto=format&fit=crop",
-  bio: "Software Engineer | Foodie | Travel Enthusiast",
-  createdAt: new Date().toISOString(), // Added missing field
-  updatedAt: new Date().toISOString(), // Added missing field
-};
-
-const BlogActionBar = () => {
+const BlogActionBar = ({blog}:{blog:Blog}) => {
   return (
-    <div className="flex items-center justify-between w-full px-3  dark:bg-background/50  bg-background/10 backdrop-blur-lg border border-border rounded-xl rounded-t-none shadow-sm">
+    <div className="flex items-center justify-between w-full px-3 dark:bg-neutral-900/50 bg-neutral-100/50 backdrop-blur-lg border border-border rounded-xl rounded-t-none shadow-sm">
       {/* Left side actions: Like, Comment, Share */}
       <div className="flex items-center gap-2">
         <Button variant="ghost" size="sm" className="flex items-center gap-2">
           <Heart className="w-4 h-4" />
-          <span className="text-xs">Like</span>
+          <span className="text-xs">{blog.likeCount}Likes</span>
         </Button>
         <Button variant="ghost" size="sm" className="flex items-center gap-2">
           <MessageCircle className="w-4 h-4" />
-          <span className="text-xs">Comment</span>
+          <span className="text-xs">{blog.commentCount}Comment</span>
         </Button>
         <Button variant="ghost" size="sm" className="flex items-center gap-2">
           <Share2 className="w-4 h-4" />
@@ -76,32 +61,48 @@ const BlogActionBar = () => {
   );
 };
 
+
 export default function BlogPreviewPage() {
   const [headerHeight, setHeaderHeight] = useState(0);
+  const { blogId } = useParams<{ blogId: string }>();
+  const { currentBlog, fetchSingleBlog, loadingSingleBlog, error } = useBlogs();
+
+  useEffect(() => {
+    if (blogId) {
+      fetchSingleBlog(blogId);
+    }
+  }, [blogId, fetchSingleBlog]);
+
+  if (loadingSingleBlog) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader />
+      </div>
+    );
+  }
+  console.log(currentBlog);
+
+  if (error || !currentBlog) {
+    return (
+      <div className="flex items-centern justify-center min-h-screen">
+        <p className="text-muted-foreground">{error || "Blog not found."}</p>
+      </div>
+    );
+  }
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-muted/50">
       <Header onHeightChange={setHeaderHeight} disableScrollEffect={true} />
       <div
-        className="relative flex-grow w-full "
+        className="relative flex-grow w-full"
         style={{ paddingTop: `${headerHeight}px` }}
       >
-        <ParticleBackground
-          className="fixed inset-0 -z-10"
-          // quantity={250}
-        />
-        <main className="container mx-auto py-4 flex justify-center items-center">
-          {/* Centered content column */}
+        <main className="container mx-auto py-8">
           <div className="mx-auto space-y-4">
-            {/* Author card now sits above the preview */}
             <div>
-              <AuthorProfileCard author={mockAuthor} />
-            <BlogActionBar  />
+              <AuthorProfileCard author={currentBlog.owner} />
+              <BlogActionBar blog={currentBlog} />
             </div>
-
-            {/* Main Blog Preview Content */}
-            <Preview />
-
-            {/* New Action Bar */}
+              {/* <Preview content={currentBlog.content} /> */}
           </div>
         </main>
       </div>

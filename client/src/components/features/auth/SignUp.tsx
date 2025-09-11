@@ -3,7 +3,6 @@
 import type React from "react";
 import { useState } from "react";
 import { Eye, EyeOff, User, Mail, Lock, Shield, FileText } from "lucide-react";
-import { continueWithGoogle } from "@/lib/auth";
 import { GlassInputWrapper } from "@/components/common/subComps/GlassInputWrapper";
 import type { SignUpPageProps } from "@/types/components/features/auth";
 import { GoogleIcon } from "@/components/icons/GoogleIcon";
@@ -12,6 +11,7 @@ import Button from "@/components/common/wrappers/Button";
 import Checkbox from "@/components/common/wrappers/Checkbox";
 import { useTheme } from "@/store/theme";
 import { GithubIcon } from "@/components/icons/GithubIcon";
+import { useAuth } from "@/store/auth";
 
 export const SignUpPage: React.FC<SignUpPageProps> = ({
   title = (
@@ -20,14 +20,14 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({
     </span>
   ),
   description = "Join our community and start your journey with us today",
-  heroImageSrc,
-  testimonials = [],
   onSignUp,
   onSignIn,
 }) => {
   const theme = useTheme();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const { continueWithGoogle, continueWithGithub } = useAuth();
 
   return (
     <div className="h-[100vh] flex flex-col md:flex-row font-sans w-[80vw] flex-1 items-center justify-center p-4 overflow-hidden">
@@ -210,7 +210,7 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({
               Google
             </Button>
             <Button
-              onClick={continueWithGoogle}
+              onClick={continueWithGithub}
               intent={theme.theme === "dark" ? "authd" : "authl"}
               size="continue"
               className="animate-app-fade-in duration-[0.7s] w-1/2 rounded-l-none"

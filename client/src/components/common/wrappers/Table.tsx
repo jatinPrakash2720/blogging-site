@@ -1,4 +1,3 @@
-import * as React from "react";
 // 1. Import the raw Shadcn Table components
 import {
   Table as ShadcnTable,

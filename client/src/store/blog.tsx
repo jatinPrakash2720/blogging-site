@@ -62,11 +62,11 @@ export const BlogProvider: React.FC<contextInterfaces.BlogProviderProps> = ({
         () => blogService.getBlogs(params),
         setLoading,
         (response) => {
-          const {blogs} = response.data;
+          const { blogs } = response.data;
           // if (data && data.blogs) {
           setAllBlogs(blogs);
           setTrendingBlogs(blogs.slice(0, 5));
-            updatePaginationState(response.data, setPagination);
+          updatePaginationState(response.data, setPagination);
           // } else {
           //   console.error("No blogs found in response:", data);
           // }
@@ -82,8 +82,9 @@ export const BlogProvider: React.FC<contextInterfaces.BlogProviderProps> = ({
       () => blogService.getBlog(blogId),
       setLoadingSingleBlog,
       (response) => {
-        const { data } = response.data;
-        setCurrentBlog(data);
+        // console.log(response);
+        // console.log(response.data);
+        setCurrentBlog(response.data);
       },
       setError
     );
@@ -343,13 +344,13 @@ export const BlogProvider: React.FC<contextInterfaces.BlogProviderProps> = ({
         () => blogService.getBlogsByTopLevelCategory(categoryId, params),
         setLoading,
         (response) => {
-        if (params.page && params.page > 1) {
-          setAllBlogs((prev) => [...prev, ...response.data.blogs]);
-        } else {
-          setAllBlogs(response.data.blogs);
-        }
-        setPagination(response.data);
-      },
+          if (params.page && params.page > 1) {
+            setAllBlogs((prev) => [...prev, ...response.data.blogs]);
+          } else {
+            setAllBlogs(response.data.blogs);
+          }
+          setPagination(response.data);
+        },
         setError
       );
     },
@@ -383,7 +384,7 @@ export const BlogProvider: React.FC<contextInterfaces.BlogProviderProps> = ({
     deleteBlogAction,
     restoreBlogAction,
     fetchFollowingFeed,
-    fetchBlogsByCategory
+    fetchBlogsByCategory,
   };
 
   return (

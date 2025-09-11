@@ -3,7 +3,6 @@
 import type React from "react";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { continueWithGoogle } from "@/lib/auth";
 import type { SignInPageProps } from "@/types/components/features/auth";
 import { GlassInputWrapper } from "@/components/common/subComps/GlassInputWrapper";
 import { GoogleIcon } from "@/components/icons/GoogleIcon";
@@ -13,10 +12,13 @@ import Label from "@/components/common/wrappers/Label";
 import { useTheme } from "@/store/theme";
 import FocusTrackingInput from "@/components/common/wrappers/FocusTrackingInput";
 import { GithubIcon } from "@/components/icons/GithubIcon";
+import { useAuth } from "@/store/auth";
 
 export const SignInPage: React.FC<SignInPageProps> = ({
   title = (
-    <span className="font-light text-foreground tracking-tighter">Welcome, Back !</span>
+    <span className="font-light text-foreground tracking-tighter">
+      Welcome, Back !
+    </span>
   ),
   description = "Access your account and continue your journey with us",
 
@@ -26,6 +28,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
 }) => {
   const theme = useTheme();
   const [showPassword, setShowPassword] = useState(false);
+  const { continueWithGoogle, continueWithGithub } = useAuth();
 
   return (
     <div className="h-[100vh] flex flex-col md:flex-row font-sans w-[100vw] flex-1 items-center justify-center p-4 overflow-hidden ">
@@ -149,7 +152,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
               Google
             </Button>
             <Button
-              onClick={continueWithGoogle}
+              onClick={continueWithGithub}
               intent={theme.theme === "dark" ? "authd" : "authl"}
               size="continue"
               className="animate-app-fade-in duration-[0.7s] w-1/2 rounded-l-none"

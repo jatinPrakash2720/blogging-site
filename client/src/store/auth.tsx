@@ -5,7 +5,7 @@ import React, {
   useState,
   useCallback,
 } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import * as userService from "../services/user.service.ts";
 import Loader from "../components/ui/Loader.js";
 import { LocalStorage, requestHandler } from "../lib/index.ts";
@@ -37,6 +37,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthReady, setIsAuthReady] = useState<boolean>(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const clearAuthState = useCallback(() => {
     setCurrentUser(null);
@@ -45,7 +46,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     LocalStorage.remove("user");
   }, []);
 
-  const fetchCurrentUser = useCallback(async () => {
+  const fetchCurrentUser = useCallback(async (): Promise<boolean> => {
+    let success = false;
     await requestHandler(
       () => userService.getCurrentUser(),
       null,
@@ -54,24 +56,53 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setCurrentUser(user);
         setIsAuthenticated(true);
         LocalStorage.set("user", user);
+        success = true;
       },
       () => {
         clearAuthState();
+        success = false;
       }
     );
+    return success;
   }, [clearAuthState]);
 
   useEffect(() => {
-    const token = LocalStorage.get("token");
     const initializeAuth = async () => {
-      if (token) {
-        await fetchCurrentUser();
+      // 1. Check for the special Google callback URL FIRST.
+      if (
+        location.pathname === "/auth/google/callback" ||
+        location.pathname === "/auth/github/callback"
+      ) {
+        const success = await fetchCurrentUser(); // This will fetch YOUR user data
+        if (success) {
+          navigate("/");
+        } else {
+          navigate("/auth/login");
+        }
+      } else {
+        // 2. For ALL other page loads, check localStorage.
+        const userFromStorage = (LocalStorage.get("user") as User) || null;
+        if (userFromStorage) {
+          setCurrentUser(userFromStorage);
+          setIsAuthenticated(true);
+        }
       }
-      setLoading(false);
+      // 3. Mark auth as ready only after the check is complete.
       setIsAuthReady(true);
     };
+
     initializeAuth();
-  }, [fetchCurrentUser]);
+  }, []);
+ 
+  const continueWithGoogle = () => {
+    const VITE_SERVER_URI = import.meta.env.VITE_SERVER_URI;
+    window.location.href = `${VITE_SERVER_URI}/users/google`;
+  };
+
+  const continueWithGithub = () => {
+    const VITE_SERVER_URI = import.meta.env.VITE_SERVER_URI;
+    window.location.href = `${VITE_SERVER_URI}/users/github`
+  }
 
   const login = useCallback(
     async (credentials: LoginCredentials) => {
@@ -136,10 +167,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       () => userService.logoutUser(),
       setLoading,
       () => {
-        clearAuthState();
+        clearAuthState(); // This now correctly clears localStorage
         navigate("/auth/login");
       },
       (error) => {
+        // Even if the API call fails, clear the frontend state
         clearAuthState();
         navigate("/auth/login");
         setError(error);
@@ -264,6 +296,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     forgotPassword,
     restorePassword,
     clearAuthError,
+    fetchCurrentUser,
+    continueWithGoogle,
+    continueWithGithub
   };
 
   if (!isAuthReady) {

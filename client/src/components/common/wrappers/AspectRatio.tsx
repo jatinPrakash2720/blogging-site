@@ -1,4 +1,3 @@
-import * as React from "react";
 // 1. Import the raw Shadcn AspectRatio component
 import { AspectRatio as ShadcnAspectRatio } from "@/components/ui/aspect-ratio";
 

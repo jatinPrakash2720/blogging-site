@@ -113,7 +113,7 @@ const TrendingBlog: React.FC<TrendingBlogProps> = ({ blogs, isLoading }) => {
       </Button>
 
       <Link
-        to={`/blog/${currentBlog.slug}`}
+        to={`/blog/${currentBlog._id}`}
         className="absolute bottom-0 left-0 right-0 p-8 text-white z-10"
       >
         <div className="inline-block mb-4">

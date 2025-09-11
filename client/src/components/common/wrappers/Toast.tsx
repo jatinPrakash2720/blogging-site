@@ -1,4 +1,3 @@
-import * as React from "react";
 // 1. Import the raw Shadcn Toaster and its hook
 import { Toaster as ShadcnToaster } from "@/components/ui/sonner";
 import { toast as shadcnToast } from "sonner";

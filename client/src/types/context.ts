@@ -45,6 +45,9 @@ export interface IAuthContext {
     payload: ResetPasswordPayload
   ) => Promise<boolean>;
   clearAuthError: () => void;
+  continueWithGoogle: () => void;
+  continueWithGithub: () => void;
+  fetchCurrentUser: () => Promise<boolean>;
 }
 
 export interface AuthProviderProps {

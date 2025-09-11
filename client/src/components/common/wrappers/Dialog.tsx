@@ -1,4 +1,3 @@
-import * as React from "react";
 // 1. Import all the Dialog components from the raw Shadcn UI file
 import {
   Dialog as ShadcnDialog,

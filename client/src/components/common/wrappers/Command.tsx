@@ -1,4 +1,3 @@
-import * as React from "react";
 // 1. Import all the Command components from the raw Shadcn UI file
 import {
   Command as ShadcnCommand,

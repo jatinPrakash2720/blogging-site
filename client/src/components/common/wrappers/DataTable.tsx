@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import {
   type ColumnDef,
   flexRender,
@@ -16,8 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/common/wrappers/Table";
-import Button from "./Button";
-
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
