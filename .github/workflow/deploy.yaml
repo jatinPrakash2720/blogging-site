@@ -1,0 +1,67 @@
+name: Deploy to GCP VM
+
+on:
+  push:
+    branches:
+      - main # or the branch you want to deploy from
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.GCP_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.GCP_HOST }} >> ~/.ssh/known_hosts
+        env:
+          GCP_HOST: ${{ secrets.GCP_HOST }}
+
+      - name: Create environment file
+        run: |
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.GCP_USER }}@${{ secrets.GCP_HOST }} "
+            cd ~/blogging-site &&
+            cat > .env << EOF
+            NODE_ENV=${{ secrets.NODE_ENV }}
+            PORT=${{ secrets.PORT }}
+            MONGODB_URI=${{ secrets.MONGODB_URI }}
+            CORS_ORIGIN=${{ secrets.CORS_ORIGIN }}
+            ACCESS_TOKEN_SECRET=${{ secrets.ACCESS_TOKEN_SECRET }}
+            ACCESS_TOKEN_EXPIRY=${{ secrets.ACCESS_TOKEN_EXPIRY }}
+            REFRESH_TOKEN_SECRET=${{ secrets.REFRESH_TOKEN_SECRET }}
+            REFRESH_TOKEN_EXPIRY=${{ secrets.REFRESH_TOKEN_EXPIRY }}
+            CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
+            CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}
+            CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
+            EMAIL_HOST=${{ secrets.EMAIL_HOST }}
+            EMAIL_PORT=${{ secrets.EMAIL_PORT }}
+            EMAIL_USER=${{ secrets.EMAIL_USER }}
+            EMAIL_PASS=${{ secrets.EMAIL_PASS }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            GITHUB_CLIENT_ID=${{ secrets.GITHUB_CLIENT_ID }}
+            GITHUB_CLIENT_SECRET=${{ secrets.GITHUB_CLIENT_SECRET }}
+            EOF
+          "
+        env:
+          GCP_USER: ${{ secrets.GCP_USER }}
+          GCP_HOST: ${{ secrets.GCP_HOST }}
+
+      - name: Deploy to VM
+        run: |
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.GCP_USER }}@${{ secrets.GCP_HOST }} "
+            cd ~/blogging-site &&
+            git pull origin main &&
+            docker-compose down &&
+            docker-compose build --no-cache &&
+            docker-compose up -d &&
+            docker system prune -f
+          "
+        env:
+          GCP_USER: ${{ secrets.GCP_USER }}
+          GCP_HOST: ${{ secrets.GCP_HOST }}

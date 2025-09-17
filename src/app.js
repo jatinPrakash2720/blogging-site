@@ -47,6 +47,15 @@ app.use("/api/v1/likes", likeRouter);
 import commentRouter from "./routes/comment.route.js";
 app.use("/api/v1/comments", commentRouter);
 
+// Health check endpoint for Docker
+app.get("/api/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Server is healthy",
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // import { apiLimiter } from "./middlewares/ratelimiter.middleware.js";
 // app.use("/api", apiLimiter);
 
